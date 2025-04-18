@@ -1,0 +1,31 @@
+# Node.js dependencies
+frontend/crypto_manager/node_modules/
+frontend/crypto_manager/.next/
+frontend/crypto_manager/out/
+
+# Python dependencies
+backend/__pycache__/
+backend/*.pyc
+backend/env/
+backend/venv/
+backend/.env
+
+# VSCode settings
+.vscode/
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Environment files
+.env
+
+# Build outputs
+dist/
+build/
+
+# Ignore large binary files that should not be committed
+frontend/crypto_manager/node_modules/@next/swc-win32-x64-msvc/next-swc.win32-x64-msvc.node
