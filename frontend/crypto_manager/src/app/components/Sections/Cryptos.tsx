@@ -1,15 +1,17 @@
 "use client";
-import GridBox from "./GridBox"
+import GridBox from "../ui/GridBox"
 import { CTA, About } from "./Buttons";
 
 export default function Cryptos() {
 	return(
-		<GridBox rows={4} cols={11} rowColors={["#84cc16", "#84cc16"]} colColors={["#84cc16", "#84cc16"]} duration={2} className="flex container rounded-3xl bg-zinc-950/35 border border-lime-500/35">
+	<section id="cryptos" className="scroll-mt-0 py-32 px-24">
 
-		<div className=" flex w-full items-center justify-center backdrop-blur-[2px]">
-		<div className="flex w-full justify-center bg-black/5 rounded-2xl">
+		<GridBox rows={4} cols={11} rowColors={["#65a30d", "#65a30d"]} colColors={["#65a30d", "#65a30d"]} duration={2} className=" flex rounded-3xl bg-neutral-900/30 border border-lime-600">
+
+		<div className=" flex w-full items-center justify-center backdrop-blur-[1px]">
+		<div className="flex w-full justify-center rounded-2xl">
 			<div className="flex flex-col py-12">
-				<div className="flex w-full text-center justify-center py-8 font-mono text-neutral-300/70 text-3xl cursor-default">Discover a large selection of coins</div>
+				<div className="flex w-full text-center justify-center py-8 text-neutral-300/70 text-3xl cursor-default">Discover a large selection of coins</div>
 				
 				<div className="flex flex-row px-4 justify-evenly gap-4">
 					<div className="border relative border-white/5 rounded-xl size-16 p-2 backdrop-blur-sm overflow-hidden hover:scale-110 hover:-translate-y-1 transition">
@@ -47,5 +49,6 @@ export default function Cryptos() {
 		</div>
 	</div>
 	</GridBox>
+</section>
 	)
 }

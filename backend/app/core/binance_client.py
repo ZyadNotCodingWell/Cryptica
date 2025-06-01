@@ -1,14 +1,15 @@
 from binance.client import Client
 
-# Initialize client without keys for public endpoints
+# Create a client (no need for API keys)
 client = Client()
 
-def get_latest_price(symbol: str):
-    return client.get_symbol_ticker(symbol=symbol)
-
-def get_candlestick_data(symbol: str, interval="1m", limit=100):
-    return client.get_klines(symbol=symbol, interval=interval, limit=limit)
-
-print(get_latest_price("ETHUSDT"))
-
+# Request exchange information (this is public)
+exchange_info = client.get_exchange_info()
+def get_latest_price(symbol):
+    try:
+        ticker = client.get_symbol_ticker(symbol=symbol)
+        return ticker['price']
+    except Exception as e:
+        print(f"Error fetching price for {symbol}: {e}")
+        return None
 

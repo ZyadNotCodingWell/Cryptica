@@ -1,13 +1,19 @@
-import Hero from "./Sections/Hero";
-import Cryptos from "./Sections/Cryptos";
-import Numbers from "./Sections/Numbers";
+import Hero from "./components/Sections/Hero";
+import Cryptos from "./components/Sections/Cryptos";
+import Numbers from "./components/Sections/Numbers";
+import { About3 } from "@/app/components/Sections/about3";
+import Companies from "./components/Sections/Companies";
+import { Forecasting } from "./components/Sections/forecasting";
 export default function Home() {
     
   return (
-    <main className="px-24 relative py-16 justify-center gap-36 flex flex-col">
+    <main className=" relative justify-center flex flex-col">
       <Hero/>
-      <Numbers/>
+      <Companies />
+      <Forecasting />
+      <About3 />
       <Cryptos/>
+      <div className="container text-center flex w-full text-neutral-800 justify-center text-xl">To the friend who made this possible, you&apos;ll never be forgotten https://chatgpt.com/c/680f77c3-aee8-8000-8082-65912fce2957</div>
     </main>
   );
 }

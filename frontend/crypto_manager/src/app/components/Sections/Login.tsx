@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import GridBox from "./GridBox";
+import GridBox from "../ui/GridBox";
 import { motion } from "framer-motion";
 
 export default function Login() {
@@ -45,6 +45,7 @@ export default function Login() {
 			const data = await response.json();
 			if (response.ok) {
 				setLoginSuccess("Login successful!");
+				localStorage.setItem("access_token", data.access_token); // Saving login token
 				router.push("/dashboard");
 			} else {
 				setLoginError(data.detail || "Login failed");
@@ -94,11 +95,11 @@ export default function Login() {
 		style = {{ x: `${translateX}%` }} transition={{ type:"tween", ease: "easeInOut", duration: 1.5  }}>
 			{/* Login Side */}
 			<div className="w-1/2 px-6 flex flex-col justify-center items-center bg-transparent border-r border-lime-800/5 shadow-xl">
-				<h1 className="text-3xl font-light text-muted-foreground tracking-tight text-lime-500 drop-shadow-[0_0_14px_#84cc16]">Access your account</h1>
-				<p className="text-lg font-light text-center text-gray-400 mb-6">First time here? Register for free <a className="text-lime-500 hover:underline" onClick={() => setTranslateX(-50)}>here</a>.</p>
+				<h1 className="text-3xl text-muted-foreground tracking-tight text-lime-500 drop-shadow-[0_0_14px_#84cc16]">Access your account</h1>
+				<p className="text-lg text-center text-neutral-300/50 mb-6">First time here? Register for free <a className="text-lime-500 hover:underline cursor-pointer" onClick={() => setTranslateX(-50)}>here</a>.</p>
 	
 				<form
-					className="w-full flex flex-col gap-4 max-w-md backdrop-blur-sm bg-black/30 border border-lime-400/35 rounded-2xl p-10 shadow-[0_0_20px_#00000066]"
+					className="w-full flex flex-col gap-4 max-w-md backdrop-blur-sm bg-neutral-950 border border-lime-400/35 rounded-2xl p-10 shadow-[0_0_20px_#00000066]"
 					onSubmit={handleLoginSubmit}
 				>
 					<h2 className="text-2xl font-semibold text-center mb-8 text-lime-500">User Login</h2>
@@ -106,25 +107,24 @@ export default function Login() {
 					<input
 						type="email"
 						placeholder="Email"
-						className="bg-white/15 text-zinc-300 px-2 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-lime-500"
+						className="bg-neutral-900/50 text-neutral-300/30 px-2 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-lime-500 placeholder:text-neutral-300/30"
 						value={loginEmail}
 						onChange={(e) => setLoginEmail(e.target.value)}
 					/>
 					<input
 						type="password"
 						placeholder="Password"
-						className="bg-white/15 text-zinc-300 px-2 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-lime-500"
+						className="bg-neutral-900/50 text-neutral-300/30 px-2 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-lime-500 placeholder:text-neutral-300/30"
 						value={loginPassword}
 						onChange={(e) => setLoginPassword(e.target.value)}
 					/>
 	
 					{loginError && <p className="text-red-500 mb-2 text-sm">{loginError}</p>}
-					{loginSuccess && <p className="text-lime-400 mb-2 text-sm">{loginSuccess}</p>}
 	
 					<button
 						type="submit"
 						disabled={!login_valid}
-						className={`px-2 py-1.5 flex gap-2 items-center justify-center rounded-lg ${login_valid ? 'bg-gradient-to-br from-zinc-700 to bg-zinc-900 border border-b-2 border-r-2 border-l-0 border-t-0 border-lime-700 text-lime-500 hover:text-lime-400 hover:border-lime-600 transition' :'bg-gradient-to-br from-zinc-700 to bg-zinc-900 border border-b-2 border-r-2 border-l-0 border-t-0 border-neutral-700 text-neutral-500 hover:text-neutral-400 hover:border-neutral-600 transition cursor-not-allowed'}`}
+						className={`px-2 py-1.5 flex gap-2 items-center justify-center rounded-lg ${login_valid ? 'bg-neutral-900 border border-lime-700 text-lime-500 hover:text-lime-400 hover:border-lime-600 transition' :'bg-neutral-900 border border-neutral-800/50 text-neutral-500/30 cursor-not-allowed'}`}
 					>
 						    <div className="relative flex items-center justify-center size-3">
                   <div className={`absolute blur-xl size-2 outline outline-2 rounded-full ${login_valid ? 'bg-lime-500 outline-lime-900 ':'bg-red-500 outline-red-900 '}`}></div>
@@ -133,7 +133,7 @@ export default function Login() {
 								<div className=" flex text-center items-center justify-center">Login</div>
 					</button>
 	
-					<div className="flex justify-between items-center mt-6 text-sm text-gray-400">
+					<div className="flex justify-between items-center mt-6 text-sm text-neutral-300/30">
 						<label className="flex items-center justify-center gap-2">
 							<input type="checkbox" className="accent-lime-500 translate-y-px bg-zinc-300/35 rounded-full" />
 							Remember me
@@ -147,10 +147,10 @@ export default function Login() {
 	
 			{/* Register Side */}
 			<div className="w-1/2 flex flex-col items-center justify-center">
-			<h1 className="text-3xl font-light text-muted-foreground tracking-tight text-lime-500 drop-shadow-[0_0_14px_#84cc16]">Welcome to Cryptica</h1>
-			<p className="text-lg font-light text-center text-gray-400 mb-6">Already registered? Connect to your account <a className="text-lime-500 hover:underline" onClick={() => setTranslateX(-0)}>here</a>.</p>
+			<h1 className="text-3xl text-muted-foreground tracking-tight text-lime-500 drop-shadow-[0_0_14px_#84cc16]">Welcome to Cryptica</h1>
+			<p className="text-lg font-light text-center text-neutral-300/30 mb-6">Already registered? Connect to your account <a className="text-lime-500 hover:underline cursor-pointer" onClick={() => setTranslateX(-0)}>here</a>.</p>
 			<form
-					className="w-full max-w-md backdrop-blur-md bg-black/30 border border-lime-400/35 rounded-2xl p-10 shadow-[0_0_20px_#00000066] flex flex-col gap-4"
+					className="w-full max-w-md backdrop-blur-md bg-neutral-950 border border-lime-400/35 rounded-2xl p-10 shadow-[0_0_20px_#00000066] flex flex-col gap-4"
 					onSubmit={handleRegisterSubmit}
 				>
 					<h2 className="text-2xl font-semibold text-center mb-8 text-lime-500">Create an Account</h2>
@@ -158,28 +158,28 @@ export default function Login() {
 					<input
 						type="text"
 						placeholder="Username"
-						className="bg-white/15 text-zinc-300 px-2 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-lime-500" 
+						className="bg-neutral-900/50 text-neutral-300/30 px-2 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-lime-500 placeholder:text-neutral-300/30"
 						value={registerUsername}
 						onChange={(e) => setRegisterUsername(e.target.value)}
 					/>
 					<input
 						type="password"
 						placeholder="Password"
-						className="bg-white/15 text-zinc-300 px-2 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-lime-500"
+						className="bg-neutral-900/50 text-neutral-300/30 px-2 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-lime-500 placeholder:text-neutral-300/30"
 						value={registerPassword}
 						onChange={(e) => setRegisterPassword(e.target.value)}
 					/>
 					<input
 						type="password"
 						placeholder="Verify Password"
-						className="bg-white/15 text-zinc-300 px-2 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-lime-500"
+						className="bg-neutral-900/50 text-neutral-300/30 px-2 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-lime-500 placeholder:text-neutral-300/30"
 						value={registerVerifyPassword}
 						onChange={(e) => setRegisterVerifyPassword(e.target.value)}
 					/>
 					<input
 						type="email"
 						placeholder="Email"
-						className={`bg-white/15 text-zinc-300 px-2 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-lime-500 ${
+						className={`bg-neutral-900/50 text-neutral-300/30 px-2 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-lime-500 placeholder:text-neutral-300/30 ${
 							registerError === 'Email already registered. Please use a different email.' ? 'ring-2 ring-red-600' : ''
 						}`}
 						value={registerEmail}
@@ -192,7 +192,7 @@ export default function Login() {
 					<button
 						type="submit"
 						disabled={!register_valid}
-						className={`px-2 py-1.5 flex gap-2 justify-center items-center rounded-lg mt-4 ${register_valid ? 'bg-gradient-to-br from-zinc-700 to bg-zinc-900 border border-b-2 border-r-2 border-l-0 border-t-0 border-lime-700 text-lime-500 hover:text-lime-400 hover:border-lime-600 transition' : 'bg-gradient-to-br from-zinc-700 to bg-zinc-900 border border-b-2 border-r-2 border-l-0 border-t-0 border-neutral-700 text-neutral-500 hover:text-neutral-400 hover:border-neutral-600 transition cursor-not-allowed'}`}
+						className={`px-2 py-1.5 flex gap-2 justify-center items-center rounded-lg mt-4 ${register_valid ? 'bg-neutral-900 border  border-lime-700 text-lime-500 hover:text-lime-400 hover:border-lime-600 transition' : 'bg-neutral-900 border border-neutral-800/50 text-neutral-500/30 cursor-not-allowed'}`}
 					>
 						  <div className="relative flex items-center justify-center size-3 right-0">
                 <div className={`absolute blur-xl size-2 outline outline-2 rounded-full ${register_valid ? 'bg-lime-500 outline-lime-900 ':'bg-red-500 outline-red-900 '}`}></div>
@@ -200,7 +200,7 @@ export default function Login() {
               </div>
 							<div className=" flex text-center items-center justify-center">Register</div>
 					</button>
-					<p className="text-sm mt-6 text-gray-400 text-center">
+					<p className="text-sm mt-6 text-neutral-300/30 text-center">
 						By signing up, you agree to our{' '}
 						<a href="#" className="text-lime-500 hover:underline">
 							Terms of Service

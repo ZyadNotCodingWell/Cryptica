@@ -21,8 +21,8 @@ export interface GridBoxProps {
 export default function GridBox({
   rows = 5,
   cols = 10,
-  rowColors = ['#2d7aed', '#EC67C1'],
-  colColors = ['#2d7aed', '#EC67C1'],
+  rowColors = ['bef2640', '#4d7c0f'],
+  colColors = ['bef2640', '#4d7c0f'],
   duration = 2,
   className = '',
   children,
@@ -32,7 +32,7 @@ export default function GridBox({
       {/* Horizontal moving lines */}
       <div className="absolute inset-0 flex flex-col justify-between">
         {Array.from({ length: rows }).map((_, rowIndex) => (
-          <div key={rowIndex} className="relative w-full h-px bg-slate-700/30">
+          <div key={rowIndex} className="relative w-full h-px bg-neutral-900 [mask-image:linear-gradient(to_right,transparent,black_50%,transparent)]">
             {rowColors.map((color, idx) => (
               <motion.div
                 key={idx}
@@ -50,7 +50,7 @@ export default function GridBox({
       {/* Vertical moving lines */}
       <div className="absolute inset-0 flex justify-between">
         {Array.from({ length: cols }).map((_, colIndex) => (
-          <div key={colIndex} className="relative w-px h-full bg-slate-700/30">
+          <div key={colIndex} className="relative w-px h-full bg-neutral-900 [mask-image:linear-gradient(to_top,transparent,black_45%,black_55%,transparent)]">
             {colColors.map((color, idx) => (
               <motion.div
                 key={idx}
