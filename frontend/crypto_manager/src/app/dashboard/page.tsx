@@ -4,7 +4,7 @@ import React from "react";
 
 export default function Page() {
   return(
-		<div className="absolute inset-0 overflow-clip w-[100vw] h-[100vh] z-50">
+	<div className="absolute inset-0 h-[100dvh] overflow-y-clip">
 			<ClientDashboard />;
 		</div>
 	)

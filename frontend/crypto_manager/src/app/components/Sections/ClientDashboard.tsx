@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import React from 'react';
 import {TradeScreen} from '../LayoutElements/TradeScreen';
 import GridBox from '../ui/GridBox';
+import { Skeleton } from '../ui/skeleton';
 
 interface Coin {
   name: string;
@@ -89,7 +90,7 @@ export default function ClientDashboard() {
 
 
 	return (
-		<div className={`antialiased px-1 py-2 gap-4 w-full bg-black flex flex-row h-full overflow-hidden`}>
+		<div className={`antialiased py-2 gap-2 w-full bg-black grid grid-cols-12 grid-rows-1 h-full`}>
 			<Sidebar>
 				{coins.map((coin) => (
 					<FollowedCoin
@@ -102,27 +103,10 @@ export default function ClientDashboard() {
 					/>
 				))}
 			</Sidebar>
-			<main className="relative justify-start gap-4 flex flex-col w-full h-full bg-transparent overflow-auto">
-				{dashboardData?.username ? (
-					<DashHeader setSearchResults={setSearchResults} searchResults={searchResults} username={dashboardData?.username} token={token!} />
-				) : (
-					<div className='flex flex-row w-full py-3 text-5xl bg-neutral-950 border border-neutral-300/5 rounded-2xl text-center items-center text-transparent'>Loading</div>
-				)}
-				<div className="flex flex-row h-full justify-between gap-8 overflow-auto">
-					<GridBox  rows={7} cols={5} rowColors={['#84cc1600', '#84cc16']} colColors={['#84cc16', '#84cc1600']} duration={5} className="flex w-full h-full rounded-3xl overflow-clip">
-						<section className="w-full h-full flex flex-col rounded-xl items-center border border-lime-500/0 overflow-auto"> 
-							{loading ? (
-								<div className="text-transparent flex w-full h-full border border-neutral-300/5 bg-neutral-950 rounded-2xl items-center justify-center text-5xl">Loading...</div>
-							) : (
-								<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-									{/* Add something here later */} 
-								</div>
-							)}
-							<div className="flex-1 w-full overflow-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-lime-500">
-								<TradeScreen apiReference={selectedApiRef} />
-							</div>
-						</section>
-					</GridBox>
+			<main className="justify-start col-span-10 flex flex-col w-full h-full bg-neutral-950 rounded-2xl">
+				<DashHeader setSearchResults={setSearchResults} searchResults={searchResults} username={dashboardData? dashboardData.username : <Skeleton className='h-6 w-16' />  } token={token!} />
+				<div className='flex flex-1 relative'>
+					<TradeScreen apiReference={selectedApiRef} />
 				</div>
 			</main>
 		</div>

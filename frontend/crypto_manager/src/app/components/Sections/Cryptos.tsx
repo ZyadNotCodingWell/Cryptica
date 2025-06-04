@@ -1,54 +1,137 @@
 "use client";
-import GridBox from "../ui/GridBox"
-import { CTA, About } from "./Buttons";
+import { motion } from "framer-motion";
+
+const cryptos = [
+  {
+    name: "Bitcoin",
+    symbol: "BTC",
+    icon: "https://assets.coingecko.com/coins/images/1/large/bitcoin.png",
+  },
+  {
+    name: "Ethereum",
+    symbol: "ETH",
+    icon: "https://assets.coingecko.com/coins/images/279/large/ethereum.png",
+  },
+  {
+    name: "Solana",
+    symbol: "SOL",
+    icon: "https://assets.coingecko.com/coins/images/4128/large/solana.png",
+  },
+  {
+    name: "Binance Coin",
+    symbol: "BNB",
+    icon: "https://assets.coingecko.com/coins/images/825/large/binance-coin-logo.png",
+  },
+  {
+    name: "Polygon",
+    symbol: "MATIC",
+    icon: "https://assets.coingecko.com/coins/images/4713/large/matic-token-icon.png",
+  },
+  {
+    name: "Cardano",
+    symbol: "ADA",
+    icon: "https://assets.coingecko.com/coins/images/975/large/cardano.png",
+  },
+  {
+    name: "XRP",
+    symbol: "XRP",
+    icon: "https://assets.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png",
+  },
+  {
+    name: "Dogecoin",
+    symbol: "DOGE",
+    icon: "https://assets.coingecko.com/coins/images/5/large/dogecoin.png",
+  },
+  {
+    name: "Avalanche",
+    symbol: "AVAX",
+    icon: "https://assets.coingecko.com/coins/images/12559/large/coin-round-red.png",
+  },
+  {
+    name: "Chainlink",
+    symbol: "LINK",
+    icon: "https://assets.coingecko.com/coins/images/877/large/chainlink-new-logo.png",
+  },
+  {
+    name: "Uniswap",
+    symbol: "UNI",
+    icon: "https://assets.coingecko.com/coins/images/12504/large/uniswap-uni.png",
+  },
+  {
+    name: "Litecoin",
+    symbol: "LTC",
+    icon: "https://assets.coingecko.com/coins/images/2/large/litecoin.png",
+  },
+  {
+    name: "Arbitrum",
+    symbol: "ARB",
+    icon: "https://assets.coingecko.com/coins/images/16547/large/photo_2023-03-29_21.47.00.jpeg",
+  },
+  {
+    name: "Optimism",
+    symbol: "OP",
+    icon: "https://assets.coingecko.com/coins/images/25244/large/Optimism.png",
+  },
+  {
+    name: "Cosmos",
+    symbol: "ATOM",
+    icon: "https://assets.coingecko.com/coins/images/1481/large/cosmos_hub.png",
+  },
+  {
+    name: "Aptos",
+    symbol: "APT",
+    icon: "https://assets.coingecko.com/coins/images/26455/large/aptos_round.png",
+  },
+];
+
+
+// Duplicate for seamless looping
+const fullList = [...cryptos, ...cryptos];
 
 export default function Cryptos() {
-	return(
-	<section id="cryptos" className="scroll-mt-0 py-32 px-24">
+  return (
+    <section className="py-32 px-6 md:px-24 relative">
+      <div className="flex flex-col items-center text-center mb-12">
+        <h2 className="text-3xl md:text-4xl font-semibold text-neutral-200 mb-6">
+          Discover a Large Selection of Coins
+        </h2>
+        <p className="text-neutral-400 max-w-xl text-lg">
+          Track real-time and forecasted data for your favorite cryptocurrencies, all in one dashboard.
+        </p>
+      </div>
 
-		<GridBox rows={4} cols={11} rowColors={["#65a30d", "#65a30d"]} colColors={["#65a30d", "#65a30d"]} duration={2} className=" flex rounded-3xl bg-neutral-900/30 border border-lime-600">
+      {/* Infinite carousel with gradient mask */}
+      <div className="relative w-full overflow-hidden  [mask-image:linear-gradient(to_right,transparent_15%,black_35%,black_65%,transparent_85%)]">
+        <div className="pointer-events-none absolute inset-0 z-10" />
 
-		<div className=" flex w-full items-center justify-center backdrop-blur-[1px]">
-		<div className="flex w-full justify-center rounded-2xl">
-			<div className="flex flex-col py-12">
-				<div className="flex w-full text-center justify-center py-8 text-neutral-300/70 text-3xl cursor-default">Discover a large selection of coins</div>
-				
-				<div className="flex flex-row px-4 justify-evenly gap-4">
-					<div className="border relative border-white/5 rounded-xl size-16 p-2 backdrop-blur-sm overflow-hidden hover:scale-110 hover:-translate-y-1 transition">
-						<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <g fill="none"> <circle cx="16" cy="16" r="16" fill="#F3BA2F"></circle> <path fill="#FFF" d="M12.116 14.404L16 10.52l3.886 3.886 2.26-2.26L16 6l-6.144 6.144 2.26 2.26zM6 16l2.26-2.26L10.52 16l-2.26 2.26L6 16zm6.116 1.596L16 21.48l3.886-3.886 2.26 2.259L16 26l-6.144-6.144-.003-.003 2.263-2.257zM21.48 16l2.26-2.26L26 16l-2.26 2.26L21.48 16zm-3.188-.002h.002V16L16 18.294l-2.291-2.29-.004-.004.004-.003.401-.402.195-.195L16 13.706l2.293 2.293z"></path> </g> </g></svg>
-						<svg className="absolute inset-0 blur-md brightness-75 opacity-30 -z-10" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <g fill="none"> <circle cx="16" cy="16" r="16" fill="#F3BA2F"></circle> <path fill="#FFF" d="M12.116 14.404L16 10.52l3.886 3.886 2.26-2.26L16 6l-6.144 6.144 2.26 2.26zM6 16l2.26-2.26L10.52 16l-2.26 2.26L6 16zm6.116 1.596L16 21.48l3.886-3.886 2.26 2.259L16 26l-6.144-6.144-.003-.003 2.263-2.257zM21.48 16l2.26-2.26L26 16l-2.26 2.26L21.48 16zm-3.188-.002h.002V16L16 18.294l-2.291-2.29-.004-.004.004-.003.401-.402.195-.195L16 13.706l2.293 2.293z"></path> </g> </g></svg>
-					</div>
-					<div className="border relative border-white/5 rounded-xl size-16 p-2 backdrop-blur-sm overflow-hidden hover:scale-110 hover:-translate-y-1 transition">
-						<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <g fill="none"> <circle fill="#66F9A1" cx="16" cy="16" r="16"></circle> <path d="M9.925 19.687a.59.59 0 01.415-.17h14.366a.29.29 0 01.207.497l-2.838 2.815a.59.59 0 01-.415.171H7.294a.291.291 0 01-.207-.498l2.838-2.815zm0-10.517A.59.59 0 0110.34 9h14.366c.261 0 .392.314.207.498l-2.838 2.815a.59.59 0 01-.415.17H7.294a.291.291 0 01-.207-.497L9.925 9.17zm12.15 5.225a.59.59 0 00-.415-.17H7.294a.291.291 0 00-.207.498l2.838 2.815c.11.109.26.17.415.17h14.366a.291.291 0 00.207-.498l-2.838-2.815z" fill="#FFF"></path> </g> </g></svg>
-						<svg className="absolute inset-0 blur-md brightness-75 opacity-30 -z-10" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <g fill="none"> <circle fill="#66F9A1" cx="16" cy="16" r="16"></circle> <path d="M9.925 19.687a.59.59 0 01.415-.17h14.366a.29.29 0 01.207.497l-2.838 2.815a.59.59 0 01-.415.171H7.294a.291.291 0 01-.207-.498l2.838-2.815zm0-10.517A.59.59 0 0110.34 9h14.366c.261 0 .392.314.207.498l-2.838 2.815a.59.59 0 01-.415.17H7.294a.291.291 0 01-.207-.497L9.925 9.17zm12.15 5.225a.59.59 0 00-.415-.17H7.294a.291.291 0 00-.207.498l2.838 2.815c.11.109.26.17.415.17h14.366a.291.291 0 00.207-.498l-2.838-2.815z" fill="#FFF"></path> </g> </g></svg>
-					</div>
-					<div className="border relative border-white/5 rounded-xl size-16 p-2 backdrop-blur-sm overflow-hidden hover:scale-110 hover:-translate-y-1 transition">
-						<svg xmlns="http://www.w3.org/2000/svg" aria-label="Ethereum" role="img" viewBox="0 0 512 512" fill="#000000"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"><rect width="512" height="512" rx="15%" fill="#ffffff00"></rect><path fill="#3C3C3B" d="m256 362v107l131-185z"></path><path fill="#343434" d="m256 41l131 218-131 78-132-78"></path><path fill="#8C8C8C" d="m256 41v158l-132 60m0 25l132 78v107"></path><path fill="#141414" d="m256 199v138l131-78"></path><path fill="#393939" d="m124 259l132-60v138"></path></g></svg>
-						<svg className="absolute inset-0 blur-md brightness-75 opacity-30 -z-10" xmlns="http://www.w3.org/2000/svg" aria-label="Ethereum" role="img" viewBox="0 0 512 512" fill="#000000"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"><rect width="512" height="512" rx="15%" fill="#ffffff00"></rect><path fill="#3C3C3B" d="m256 362v107l131-185z"></path><path fill="#343434" d="m256 41l131 218-131 78-132-78"></path><path fill="#8C8C8C" d="m256 41v158l-132 60m0 25l132 78v107"></path><path fill="#141414" d="m256 199v138l131-78"></path><path fill="#393939" d="m124 259l132-60v138"></path></g></svg>
-					</div>
-					<div className="border relative border-white/5 rounded-xl size-16 p-2 backdrop-blur-sm overflow-hidden hover:scale-110 hover:-translate-y-1 transition">
-						<svg viewBox="0.004 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M63.04 39.741c-4.274 17.143-21.638 27.575-38.783 23.301C7.12 58.768-3.313 41.404.962 24.262 5.234 7.117 22.597-3.317 39.737.957c17.144 4.274 27.576 21.64 23.302 38.784z" fill="#f7931a"></path><path d="M46.11 27.441c.636-4.258-2.606-6.547-7.039-8.074l1.438-5.768-3.512-.875-1.4 5.616c-.922-.23-1.87-.447-2.812-.662l1.41-5.653-3.509-.875-1.439 5.766c-.764-.174-1.514-.346-2.242-.527l.004-.018-4.842-1.209-.934 3.75s2.605.597 2.55.634c1.422.355 1.68 1.296 1.636 2.042l-1.638 6.571c.098.025.225.061.365.117l-.37-.092-2.297 9.205c-.174.432-.615 1.08-1.609.834.035.051-2.552-.637-2.552-.637l-1.743 4.02 4.57 1.139c.85.213 1.683.436 2.502.646l-1.453 5.835 3.507.875 1.44-5.772c.957.26 1.887.5 2.797.726L27.504 50.8l3.511.875 1.453-5.823c5.987 1.133 10.49.676 12.383-4.738 1.527-4.36-.075-6.875-3.225-8.516 2.294-.531 4.022-2.04 4.483-5.157zM38.087 38.69c-1.086 4.36-8.426 2.004-10.807 1.412l1.928-7.729c2.38.594 10.011 1.77 8.88 6.317zm1.085-11.312c-.99 3.966-7.1 1.951-9.083 1.457l1.748-7.01c1.983.494 8.367 1.416 7.335 5.553z" fill="#ffffff"></path></g></svg>
-						<svg className="absolute inset-0 blur-md brightness-75 opacity-30 -z-10" viewBox="0.004 0 64 64" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M63.04 39.741c-4.274 17.143-21.638 27.575-38.783 23.301C7.12 58.768-3.313 41.404.962 24.262 5.234 7.117 22.597-3.317 39.737.957c17.144 4.274 27.576 21.64 23.302 38.784z" fill="#f7931a"></path><path d="M46.11 27.441c.636-4.258-2.606-6.547-7.039-8.074l1.438-5.768-3.512-.875-1.4 5.616c-.922-.23-1.87-.447-2.812-.662l1.41-5.653-3.509-.875-1.439 5.766c-.764-.174-1.514-.346-2.242-.527l.004-.018-4.842-1.209-.934 3.75s2.605.597 2.55.634c1.422.355 1.68 1.296 1.636 2.042l-1.638 6.571c.098.025.225.061.365.117l-.37-.092-2.297 9.205c-.174.432-.615 1.08-1.609.834.035.051-2.552-.637-2.552-.637l-1.743 4.02 4.57 1.139c.85.213 1.683.436 2.502.646l-1.453 5.835 3.507.875 1.44-5.772c.957.26 1.887.5 2.797.726L27.504 50.8l3.511.875 1.453-5.823c5.987 1.133 10.49.676 12.383-4.738 1.527-4.36-.075-6.875-3.225-8.516 2.294-.531 4.022-2.04 4.483-5.157zM38.087 38.69c-1.086 4.36-8.426 2.004-10.807 1.412l1.928-7.729c2.38.594 10.011 1.77 8.88 6.317zm1.085-11.312c-.99 3.966-7.1 1.951-9.083 1.457l1.748-7.01c1.983.494 8.367 1.416 7.335 5.553z" fill="#ffffff"></path></g></svg>
-					</div>
-					<div className="border relative border-white/5 rounded-xl size-16 p-2 backdrop-blur-sm overflow-hidden hover:scale-110 hover:-translate-y-1 transition">
-						<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <g fill="none" fillRule="evenodd"> <circle cx="16" cy="16" r="16" fill="#26A17B"></circle> <path fill="#FFF" d="M17.922 17.383v-.002c-.11.008-.677.042-1.942.042-1.01 0-1.721-.03-1.971-.042v.003c-3.888-.171-6.79-.848-6.79-1.658 0-.809 2.902-1.486 6.79-1.66v2.644c.254.018.982.061 1.988.061 1.207 0 1.812-.05 1.925-.06v-2.643c3.88.173 6.775.85 6.775 1.658 0 .81-2.895 1.485-6.775 1.657m0-3.59v-2.366h5.414V7.819H8.595v3.608h5.414v2.365c-4.4.202-7.709 1.074-7.709 2.118 0 1.044 3.309 1.915 7.709 2.118v7.582h3.913v-7.584c4.393-.202 7.694-1.073 7.694-2.116 0-1.043-3.301-1.914-7.694-2.117"></path> </g> </g></svg>	
-						<svg className="absolute inset-0 blur-md brightness-75 opacity-30 -z-10" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="#000000"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <g fill="none" fillRule="evenodd"> <circle cx="16" cy="16" r="16" fill="#26A17B"></circle> <path fill="#FFF" d="M17.922 17.383v-.002c-.11.008-.677.042-1.942.042-1.01 0-1.721-.03-1.971-.042v.003c-3.888-.171-6.79-.848-6.79-1.658 0-.809 2.902-1.486 6.79-1.66v2.644c.254.018.982.061 1.988.061 1.207 0 1.812-.05 1.925-.06v-2.643c3.88.173 6.775.85 6.775 1.658 0 .81-2.895 1.485-6.775 1.657m0-3.59v-2.366h5.414V7.819H8.595v3.608h5.414v2.365c-4.4.202-7.709 1.074-7.709 2.118 0 1.044 3.309 1.915 7.709 2.118v7.582h3.913v-7.584c4.393-.202 7.694-1.073 7.694-2.116 0-1.043-3.301-1.914-7.694-2.117"></path> </g> </g></svg>	
-					</div>
-				</div>
-
-
-				<div className="mt-8 text-neutral-300/70 text-center text-balance mb-8 max-w-2xl cursor-default">
-					Our service extends more than <span className="text-lime-500">300+</span> cryptocurrencies tracking and forecasting solutions.
-				</div>
-				<div className="flex w-full justify-center gap-4">
-					<CTA />
-					<About/>
-				</div>
-				
-			</div>
-		</div>
-	</div>
-	</GridBox>
-</section>
-	)
+        <motion.div
+          className="flex gap-6 w-max"
+          animate={{
+            x: ["0%", "-50%"],
+          }}
+          transition={{
+            repeat: Infinity,
+            ease: "linear",
+            duration: 20,
+          }}
+        >
+          {fullList.map((crypto, index) => (
+            <div
+              key={index}
+              className="bg-neutral-900/40 backdrop-blur-md border border-white/10 shadow-inner p-4 rounded-2xl w-28 h-28 flex flex-col items-center justify-center shrink-0"
+            >
+              <img
+                src={crypto.icon}
+                alt={crypto.name}
+                className="w-10 h-10 mb-2"
+              />
+              <div className="text-sm text-neutral-200 font-medium">
+                {crypto.symbol}
+              </div>
+            </div>
+          ))}
+        </motion.div>
+      </div>
+    </section>
+  );
 }

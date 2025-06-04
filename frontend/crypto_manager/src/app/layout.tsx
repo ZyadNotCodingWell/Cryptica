@@ -40,11 +40,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${exo_2.className} antialiased w-full bg-neutral-950 relative`}
+        className={`${exo_2.className} antialiased w-full h-full bg-neutral-950 relative`}
       >
-        <Navigation/>
           {children}
-        <Footer/>
       </body>
     </html>
   );
