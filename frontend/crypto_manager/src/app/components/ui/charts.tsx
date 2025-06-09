@@ -1,162 +1,153 @@
 "use client";
-
+import { useMemo } from 'react';
 import {
   ResponsiveContainer,
-  LineChart,
-  BarChart,
-  Line,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-} from "recharts";
-import React from 'react'
+  ComposedChart, Line, Bar, XAxis, YAxis, Tooltip, 
+  CartesianGrid, ReferenceLine, Legend
+} from 'recharts';
 
+type ChartConfig = {
+  typeLine: boolean;
+  dataKey: string;
+  color: string;
+  yAxisId: string;
+  strokeWidth?: number;
+  name?: string;
+};
 
-// === I had the componenets dona already, there was no point in refactoring this again ===
+export const ChartContainer = ({ candles, activeIndicators }: {
+  candles: any[];
+  activeIndicators: string[];
+}) => {
+  // Memoized data transformations
+  const { closeData, volumeData, atrData, rsiData, ma20Data, ma30Data, macdData } = useMemo(() => ({
+    closeData: transformClosePrice(candles),
+    volumeData: transformVolume(candles),
+    atrData: transformATR(candles),
+    rsiData: transformRSI(candles),
+    ma20Data: transformMA20(candles),
+    ma30Data: transformMA30(candles),
+    macdData: transformMACD(candles),
+  }), [candles]);
 
+  // Merge all active data into one dataset
+  const mergedData = useMemo(() => {
+    return closeData.map((d, i) => ({
+      ...d,
+      volume: volumeData[i]?.volume,
+      atr: atrData[i]?.atr,
+      rsi: rsiData[i]?.rsi,
+      ma20: ma20Data[i]?.ma20,
+      ma30: ma30Data[i]?.ma30,
+      macd: macdData[i]?.macd,
+      signal: macdData[i]?.signal,
+      histogram: macdData[i]?.histogram,
+    }));
+  }, [closeData, volumeData, atrData, rsiData, ma20Data, ma30Data, macdData]);
 
-export default function ClosePrice( {lineData} : {lineData: any} ) {
-	return(
-		<ResponsiveContainer width="100%" height="100%">
-		<LineChart data={lineData}>
-			<CartesianGrid stroke="#262626" strokeDasharray="4 4" />
-			<XAxis
-				dataKey="date"
-				tick={{ fill: '#afafafaf', fontSize: 12 }}
-				axisLine={{ stroke: 'transparent' }}
-				tickLine={false}
-			/>
-			<YAxis
-				tick={{ fill: '#afafafaf', fontSize: 12 }}
-				axisLine={{ stroke: '#transparent' }}
-				tickLine={false}
-			/>
-			<Tooltip
-				wrapperStyle={{ backgroundColor: 'transparent', border: 'none' }}
-				contentStyle={{ backgroundColor: 'transparent', border: 'none', fontSize: 12 }}
-				labelStyle={{ color: '#afafaf' }}
-				itemStyle={{ color: '#afafaf' }}
-			/>
-			<Line
-				type="monotone"
-				dataKey="close"
-				stroke="#84cc16"
-				strokeWidth={2}
-				dot={false}
-			/>
-		</LineChart>
-	</ResponsiveContainer>
-	)
-}
+  // Dynamic chart configurations
+  const chartConfigs: ChartConfig[] = [
+    { typeLine: true, dataKey: 'close', color: '#84cc16', yAxisId: 'price', name: 'Price' },
+    { typeLine: false, dataKey: 'volume', color: '#3b82f6', yAxisId: 'volume', name: 'Volume' },
+    { typeLine: true, dataKey: 'atr', color: '#a855f7', yAxisId: 'atr', name: 'ATR' },
+    { typeLine: true, dataKey: 'rsi', color: '#ef4444', yAxisId: 'rsi', name: 'RSI' },
+    { typeLine: true, dataKey: 'ma20', color: '#f59e0b', yAxisId: 'price', name: 'MA20' },
+    { typeLine: true, dataKey: 'ma30', color: '#10b981', yAxisId: 'price', name: 'MA30' },
+    { typeLine: true, dataKey: 'macd', color: '#f71916', yAxisId: 'macd', name: 'MACD' },
+    { typeLine: true, dataKey: 'signal', color: '#3f6212', yAxisId: 'macd', name: 'Signal' },
+  ].filter(config => activeIndicators.includes(config.dataKey));
 
-export function Volume({ volume }: { volume: { date: string; volume: number }[] }) {
-	return (
-		<ResponsiveContainer width="100%" height="100%">
-			<BarChart data={volume}>
-				<CartesianGrid stroke="#262626" strokeDasharray="4 4" />
-				<XAxis
-					dataKey="date"
-					tick={{ fill: '#afafafaf', fontSize: 12 }}
-					axisLine={{ stroke: 'transparent' }}
-					tickLine={true}
-				/>
-				<YAxis
-					tick={{ fill: '#afafafaf', fontSize: 12 }}
-					axisLine={{ stroke: 'transparent' }}
-					tickLine={true}
-				/>
-				<Tooltip
-					wrapperStyle={{ backgroundColor: 'transparent', border: 'none', boxShadow: 'none' }}
-					contentStyle={{ backgroundColor: 'transparent', border: 'none', boxShadow: 'none', fontSize: 12 }}
-					labelStyle={{ color: '#afafaf' }}
-					itemStyle={{ color: '#afafaf' }}
-					cursor={{ fill: 'transparent' }} // disables the hover bar highlight
+  // MACD histogram (special case)
+  const showHistogram = activeIndicators.includes('macd') && 
+    mergedData.some(d => d.histogram !== undefined);
 
-				/>
-				<Bar
-					dataKey="volume"
-					fill="#84cc16"
+  return (
+    <ResponsiveContainer width="100%" height={500}>
+      <ComposedChart data={mergedData}>
+        <CartesianGrid stroke="#262626" strokeDasharray="4 4" />
+        <XAxis 
+          dataKey="date" 
+          tick={{ fill: '#afafaf', fontSize: 12 }}
+          axisLine={{ stroke: '#3f3f46' }}
+        />
 
-					radius={[3.5, 3.5, 0, 0]}
-					barSize={20}
-				/>
-			</BarChart>
-		</ResponsiveContainer>
-	);
-}
+        {/* Dynamic Y-Axes */}
+        {activeIndicators.includes('close') && (
+          <YAxis yAxisId="price" orientation="left" stroke="#84cc16" />
+        )}
+        {activeIndicators.includes('volume') && (
+          <YAxis yAxisId="volume" orientation="right" stroke="#3b82f6" />
+        )}
+        {activeIndicators.includes('atr') && (
+          <YAxis yAxisId="atr" orientation="right" stroke="#a855f7" />
+        )}
+        {activeIndicators.includes('rsi') && (
+          <YAxis yAxisId="rsi" domain={[0, 100]} stroke="#ef4444" />
+        )}
+        {activeIndicators.includes('macd') && (
+          <YAxis yAxisId="macd" orientation="right" stroke="#f71916" />
+        )}
 
-export function ATR({ atrData }: { atrData: { date: string; atr: number }[] }) {
-	return (
-		<ResponsiveContainer width="100%" height="100%">
-			<LineChart data={atrData}>
-				<CartesianGrid stroke="#262626" strokeDasharray="4 4" />
-				<XAxis
-					dataKey="date"
-					tick={{ fill: '#afafafaf', fontSize: 12 }}
-					axisLine={{ stroke: 'transparent' }}
-					tickLine={false}
-				/>
-				<YAxis
-					tick={{ fill: '#afafafaf', fontSize: 12 }}
-					axisLine={{ stroke: 'transparent' }}
-					tickLine={false}
-				/>
-				<Tooltip
-					wrapperStyle={{ backgroundColor: 'transparent', border: 'none' }}
-					contentStyle={{ backgroundColor: 'transparent', border: 'none', fontSize: 12 }}
-					labelStyle={{ color: '#afafaf' }}
-					itemStyle={{ color: '#afafaf' }}
-				/>
-				<Line
-					type="monotone"
-					dataKey="atr"
-					stroke="#84cc16"
-					strokeWidth={2}
-					dot={false}
-				/>
-			</LineChart>
-		</ResponsiveContainer>
-	);
-}
+        <Tooltip
+          contentStyle={{
+            background: 'transparent',
+            borderColor: 'transparent',
+            borderRadius: '0.5rem',
+						color: '#ffffff',
+          }}
+          formatter={(value, name) => [
+            name === 'RSI' && typeof value === 'number' ? `${value.toFixed(2)}%` : value,
+            name,
+          ]}
+        />
+        <Legend />
 
+        {/* Dynamic Plots */}
+        {chartConfigs.map((config) => (
+          config.typeLine ? (
+            <Line
+              key={config.dataKey}
+              yAxisId={config.yAxisId}
+              dataKey={config.dataKey}
+              stroke={config.color}
+              strokeWidth={config.strokeWidth || 2}
+              dot={false}
+              name={config.name}
+            />
+          ) : (
+            <Bar
+              key={config.dataKey}
+              yAxisId={config.yAxisId}
+              dataKey={config.dataKey}
+              fill={config.color}
+              radius={[4, 4, 0, 0]}
+              name={config.name}
+            />
+          )
+        ))}
 
+        {/* MACD Histogram (special bar plot) */}
+        {showHistogram && (
+          <Bar
+            yAxisId="macd"
+            dataKey="histogram"
+            fill="#8884d8"
+            radius={[2, 2, 0, 0]}
+            name="Histogram"
+          />
+        )}
 
-export function RSI({ rsiData }: { rsiData: { date: string; rsi: number }[] }) {
-	return (
-		<ResponsiveContainer width="100%" height="100%">
-			<LineChart data={rsiData}>
-				<CartesianGrid stroke="#262626" strokeDasharray="4 4" />
-				<XAxis
-					dataKey="date"
-					tick={{ fill: '#afafafaf', fontSize: 12 }}
-					axisLine={{ stroke: 'transparent' }}
-					tickLine={false}
-				/>
-				<YAxis
-					domain={[0, 100]}
-					tick={{ fill: '#afafafaf', fontSize: 12 }}
-					axisLine={{ stroke: 'transparent' }}
-					tickLine={false}
-				/>
-				<Tooltip
-					wrapperStyle={{ backgroundColor: 'transparent', border: 'none' }}
-					contentStyle={{ backgroundColor: 'transparent', border: 'none', fontSize: 12 }}
-					labelStyle={{ color: '#afafaf' }}
-					itemStyle={{ color: '#afafaf' }}
-				/>
-				<Line
-					type="monotone"
-					dataKey="rsi"
-					stroke="#84cc16"
-					strokeWidth={2}
-					dot={false}
-				/>
-			</LineChart>
-		</ResponsiveContainer>
-	)
-}
+        {/* RSI Reference Lines */}
+        {activeIndicators.includes('rsi') && (
+          <>
+            <ReferenceLine y={70} yAxisId="rsi" stroke="#ef4444" strokeDasharray="3 3" />
+            <ReferenceLine y={30} yAxisId="rsi" stroke="#10b981" strokeDasharray="3 3" />
+          </>
+        )}
+      </ComposedChart>
+    </ResponsiveContainer>
+  );
+};
 
 
 
@@ -228,32 +219,76 @@ export const transformRSI = (candles: any[], period = 14) => {
   return rsiSeries;
 };
 
-// === CHART COMPONENTS ===
+export const transformMA20 = (candles: any[]) => {
+  return candles
+    .map((_, i) => {
+      if (i < 20) return null;
+      const slice = candles.slice(i - 20, i);
+      const avg = slice.reduce((sum, c) => sum + parseFloat(c[4]), 0) / 20;
 
-export const ClosePriceChart = ({ candles }: { candles: any[] }) => {
-  const seriesData = transformClosePrice(candles);
-  return (
-    <ClosePrice lineData={seriesData} />
-  );
+      return {
+        date: new Date(candles[i][0]).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        ma20: avg,
+      };
+    })
+    .filter(Boolean);
 };
 
-export const VolumeChart = ({ candles }: { candles: any[] }) => {
-  const seriesData = transformVolume(candles);
-  return (
-    <Volume volume={seriesData} />
-  );
+export const transformMA30 = (candles: any[]) => {
+  return candles
+    .map((_, i) => {
+      if (i < 30) return null;
+      const slice = candles.slice(i - 30, i);
+      const avg = slice.reduce((sum, c) => sum + parseFloat(c[4]), 0) / 30;
+
+      return {
+        date: new Date(candles[i][0]).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+        ma30: avg,
+      };
+    })
+    .filter(Boolean);
 };
 
-export const ATRChart = ({ candles }: { candles: any[] }) => {
-  const seriesData = transformATR(candles);
-  return (
-    <ATR atrData={seriesData} />
-  );
-};
+export const transformMACD = (candles: any[], fast = 12, slow = 26, signal = 9) => {
+  const closePrices = candles.map((c) => parseFloat(c[4]));
+  const ema = (data: number[], period: number) => {
+    const k = 2 / (period + 1);
+    return data.reduce((acc: number[], val, i) => {
+      if (i === 0) return [val];
+      acc.push(val * k + acc[i - 1] * (1 - k));
+      return acc;
+    }, []);
+  };
 
-export const RSIChart = ({ candles }: { candles: any[] }) => {
-  const seriesData = transformRSI(candles);
-  return (
-    <RSI rsiData={seriesData} />
+  const emaFast = ema(closePrices, fast);
+  const emaSlow = ema(closePrices, slow);
+  const macdLine = emaFast.map((val, i) =>
+    i < slow - 1 ? null : val - emaSlow[i]
   );
+  const signalLine = ema(macdLine.filter((x) => x !== null) as number[], signal);
+  const histogram = macdLine
+    .map((val, i) => (val !== null && signalLine[i - (slow - 1)] !== undefined
+      ? val - signalLine[i - (slow - 1)]
+      : null));
+
+  const result = macdLine.map((_, i) => {
+    if (i < slow + signal - 2) return null;
+    return {
+      date: new Date(candles[i][0]).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      macd: macdLine[i],
+      signal: signalLine[i - (slow - 1)],
+      histogram: histogram[i],
+    };
+  });
+
+  return result.filter(Boolean);
 };

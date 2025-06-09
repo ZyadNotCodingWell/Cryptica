@@ -24,3 +24,16 @@ async def get_24h_price_change(symbol: str):
 		except Exception as e:
 				raise HTTPException(status_code=500, detail=str(e))
 
+@router.get("/symbol-info/{symbol}")
+async def get_symbol_info(symbol: str):
+    try:
+        info = client.get_symbol_info(symbol.upper())
+        if not info:
+            raise HTTPException(status_code=404, detail="Symbol not found")
+        return {
+            "baseAsset": info["baseAsset"],
+            "quoteAsset": info["quoteAsset"]
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+

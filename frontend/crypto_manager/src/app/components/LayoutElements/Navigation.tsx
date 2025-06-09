@@ -24,8 +24,8 @@ export default function Navigation() {
     };
   });
   return (
-    <div className="sticky top-0 z-40 backdrop-blur-xl bg-black/30">
-      <div className="flex items-center justify-between max-w-screen-xl mx-auto w-full px-6 py-4">
+    <nav className="fixed top-0 inset-x-0 z-50 backdrop-blur-xl">
+      <div className="flex items-center justify-between  py-4 max-w-screen-xl mx-auto w-full px-6">
         <div className="text-3xl text-neutral-400 font-semibold cursor-default">Solance</div>
         <div className="flex items-center bg-neutral-900 rounded-xl border border-white/5 px-1.5 py-1 gap-2.5">
           {navItems.map((item) => {
@@ -56,6 +56,6 @@ export default function Navigation() {
         </div>
         <div className="text-sm text-transparent">@cyberGooner2069</div>
       </div>
-    </div>
+    </nav>
   );
 }

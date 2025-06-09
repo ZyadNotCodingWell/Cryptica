@@ -4,8 +4,8 @@ import React from "react";
 
 export default function Page() {
   return(
-	<div className="absolute inset-0 h-[100dvh] overflow-y-clip">
-			<ClientDashboard />;
-		</div>
+	<div className="absolute inset-0 h-[100dvh] overflow-y-clip z-50">
+		<ClientDashboard />;
+	</div>
 	)
 }

@@ -1,12 +1,11 @@
 "use client";
 import { useState, useEffect } from "react";
 import React from "react";
-import Link from "next/link";
 import { SearchedCoin } from "../Sections/FollowedCrypto";
 
 type Coin = {
   name: string;
-  api_reference: string;
+  apiReference: string; // ticker from backend, but keep this key for JSON shape
 };
 
 type DashHeaderProps = {
@@ -32,9 +31,9 @@ export default function DashHeader({
     }
 
     const timeoutId = setTimeout(() => {
-      fetch(`http://localhost:8000/coins/search?query=${query}`)
+      fetch(`http://localhost:8000/coins/search?query=${encodeURIComponent(query)}`)
         .then((res) => res.json())
-        .then((data) => setSearchResults(data))
+        .then((data: Coin[]) => setSearchResults(data))
         .catch((err) => console.error("Search error:", err));
     }, 300);
 
@@ -69,7 +68,7 @@ export default function DashHeader({
 
       {/* Results dropdown */}
       <ul
-        className={`absolute top-full w-full max-w-lg max-h-64 px-4 overflow-y-auto bg-neutral-950 rounded-b-lg shadow-lg border border-neutral-300/15 scrollbar-thin scrollbar-track-neutral-950 scrollbar-thumb-neutral-800 transition-opacity duration-200 ${
+        className={`absolute top-full w-full max-w-lg max-h-64 px-4 gap-1 flex flex-col overflow-y-auto bg-neutral-950 rounded-b-lg shadow-lg border border-neutral-300/15 scrollbar-thin scrollbar-track-neutral-950 scrollbar-thumb-neutral-800 transition-opacity duration-200 ${
           showResults ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
         style={{ willChange: "opacity", transform: "translateZ(0)" }}
@@ -77,9 +76,9 @@ export default function DashHeader({
         {searchResults.length > 0 ? (
           searchResults.map((coin) => (
             <SearchedCoin
-              key={coin.api_reference}
-              name={coin.name}
-              apiReference={coin.api_reference}
+              key={coin.apiReference}
+              name={coin.name}                   // Coin name as is
+              apiReference={coin.apiReference} // Ticker under apiReference prop
               token={token}
               setShowResults={setShowResults}
               clearSearch={() => setSearchResults([])}

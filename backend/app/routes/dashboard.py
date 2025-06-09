@@ -1,24 +1,28 @@
-
 from fastapi import Depends, HTTPException, APIRouter
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
-from app.db.create_tables import User
-from app.db.session import get_db
 from sqlalchemy.orm import Session
-from app.models.user import Coin, UserCrypto
 
+from app.db.models.schema import User, Coin, UserCoin
+from app.db.session import get_db
+import os
+from dotenv import load_dotenv
 
 router = APIRouter()
 
-
-SECRET_KEY = "your_secret_key"
+load_dotenv()
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
+
+def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db)
+) -> User:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id = payload.get("user_id")           # ← look here
+        user_id = payload.get("user_id")
         if user_id is None:
             raise HTTPException(status_code=401, detail="Invalid token")
         user_id = int(user_id)
@@ -31,29 +35,32 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     return user
 
 
-@router.get("/me")
-def get_my_dashboard_data(user: User = Depends(get_current_user)):
+@router.get("/me", response_model=dict)
+def get_my_profile(user: User = Depends(get_current_user)):
     return {
         "username": user.username,
-        "coins": ["BTC", "ETH", "LTC"],  # replace with actual DB fetch
+        "email": user.email,
+        "tier": user.tier.value  # enum value: "free", "pro", etc.
     }
 
+
 @router.get("/my-coins")
-def get_user_followed_coins(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    # Fetch the coins followed by the user via the user_cryptos link
-    user_coins = (
+def get_user_followed_coins(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    followed = (
         db.query(Coin)
-        .join(UserCrypto, Coin.id == UserCrypto.coin_id)
-        .filter(UserCrypto.user_id == user.id)
+        .join(UserCoin, Coin.ticker == UserCoin.coin_ticker)
+        .filter(UserCoin.user_id == user.id)
         .all()
     )
 
     return [
         {
             "name": coin.name,
-            "api_reference": coin.api_reference,
-            "icon_link": coin.icon_link
+            "ticker": coin.ticker,
+            # "icon_link": coin.icon_link  <-- remove until you add this field
         }
-        for coin in user_coins
+        for coin in followed
     ]
-

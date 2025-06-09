@@ -7,7 +7,8 @@ import {
   BarChart2,
   PieChart,
 } from "lucide-react";
-import { Skeleton } from "../ui/skeleton"; 
+import { Skeleton } from "../ui/skeleton";
+import { motion } from "framer-motion";
 
 type CoinSummaryProps = {
   apiReference: string;
@@ -46,80 +47,61 @@ export default function CoinSummary({ apiReference }: CoinSummaryProps) {
   const isLoading = !data;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 w-full ">
-      {/* Card 1 */}
-      <SummaryCard icon={<DollarSign size={18} />} label="Price & Change">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 w-full">
+      <SummaryCard icon={<DollarSign size={18} />} label="Price Summary">
         {isLoading ? (
           <>
             <Skeleton className="h-6 w-24" />
-            <div className="flex items-center gap-2 text-neutral-400 mt-2">
-            	<Skeleton className="h-5 w-16" />
-            </div>
+            <Skeleton className="h-6 w-24" />
             <Skeleton className="h-6 w-24" />
           </>
         ) : (
-          <>
-            <div className="text-xl font-bold text-neutral-100">
+          <div className="flex flex-col gap-2 text-neutral-300">
+            <div className="text-3xl font-bold text-white">
               ${data.lastPrice}
             </div>
-						<div className="flex items-center gap-2 text-neutral-400 mt-2">
-              <PieChart size={16} />
-              <h2 className="font-semibold text-sm">Price Change</h2>
-            </div>
-            <div className="text-lg font-medium">
-              <span className="text-neutral-300">{data.priceChange}</span>{" "}
-              <span className={data.priceChangePercent > 0 ? "text-lime-500" : "text-red-500"}>
+            <div className="text-md">
+              <span className="text-neutral-400">Change: </span>
+              <span className="font-medium">{data.priceChange}</span>{" "}
+              <span
+                className={`font-semibold ${
+                  data.priceChangePercent > 0 ? "text-lime-500" : "text-red-500"
+                }`}
+              >
                 ({data.priceChangePercent}%)
               </span>
             </div>
-
-          </>
-        )}
-      </SummaryCard>
-
-      {/* Card 2 */}
-      <SummaryCard icon={<TrendingUp size={18} />} label="High (24h)">
-        {isLoading ? (
-          <Skeleton className="h-8 w-24 mt-6" />
-        ) : (
-          <div className="text-2xl h-full items-center flex font-bold text-lime-400">
-            ${data.highPrice}
+            <div className="text-sm flex gap-4 mt-1 text-neutral-400">
+              <span>
+                High 24h:{" "}
+                <span className="text-lime-400 font-medium">${data.highPrice}</span>
+              </span>
+              <span>
+                Low 24h:{" "}
+                <span className="text-red-500 font-medium">${data.lowPrice}</span>
+              </span>
+            </div>
           </div>
         )}
       </SummaryCard>
 
-      {/* Card 3 */}
-      <SummaryCard icon={<TrendingDown size={18} />} label="Low (24h)">
+      <SummaryCard icon={<BarChart2 size={18} />} label="Volume Data">
         {isLoading ? (
-          <Skeleton className="h-8 w-24 mt-6" />
+          <>
+            <Skeleton className="h-6 w-24" />
+            <Skeleton className="h-6 w-24" />
+          </>
         ) : (
-          <div className="text-2xl h-full items-center flex font-bold text-red-500">
-            ${data.lowPrice}
+          <div className="flex flex-col gap-2 text-neutral-300">
+            <div className="text-md">
+              <span className="text-neutral-400">Volume:</span>{" "}
+              <span className="font-semibold text-white">{data.volume}</span>
+            </div>
+            <div className="text-md">
+              <span className="text-neutral-400">Quote Volume:</span>{" "}
+              <span className="font-semibold text-white">{data.quoteVolume}</span>
+            </div>
           </div>
-        )}
-      </SummaryCard>
-
-      {/* Card 4 */}
-      <SummaryCard icon={<BarChart2 size={18} />} label="Volume">
-        {isLoading ? (
-          <>
-            <Skeleton className="h-6 w-24" />
-            <div className="flex items-center gap-2 text-neutral-400 mt-2">
-              <Skeleton className="h-5 w-16" />
-            </div>
-            <Skeleton className="h-6 w-24" />
-          </>
-        ) : (
-          <>
-            <div className="text-xl font-semibold text-neutral-300">{data.volume}</div>
-            <div className="flex items-center gap-2 text-neutral-400 mt-2">
-              <PieChart size={16} />
-              <h2 className="font-semibold text-sm">Quote Volume</h2>
-            </div>
-            <div className="text-xl font-semibold text-neutral-300">
-              {data.quoteVolume}
-            </div>
-          </>
         )}
       </SummaryCard>
     </div>
@@ -136,12 +118,24 @@ function SummaryCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl bg-neutral-300/5 border border-neutral-300/15 backdrop-blur-lg p-5 shadow-lg flex flex-col gap-2 text-white">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.6,
+        ease: [0.22, 1, 0.36, 1],
+      }}
+      whileHover={{
+        scale: 1.0,
+        boxShadow: "0px 0px 12px rgba(255, 255, 255, 0.01)",
+      }}
+      className="rounded-xl bg-neutral-300/5 border border-neutral-800 p-6 transition-all text-white space-y-3"
+    >
       <div className="flex items-center gap-2 text-neutral-400">
         {icon}
-        <h2 className="font-semibold text-xl">{label}</h2>
+        <h2 className="font-semibold text-lg">{label}</h2>
       </div>
       {children}
-    </div>
+    </motion.div>
   );
 }

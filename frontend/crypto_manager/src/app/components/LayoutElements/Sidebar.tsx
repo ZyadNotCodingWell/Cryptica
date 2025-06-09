@@ -13,7 +13,7 @@ export default function Sidebar({ children }: { children: ReactNode }) {
     <div className="flex flex-col col-span-2 row-span-1 h-full bg-transparent rounded-2xl px-1.5 pt-8 pb-2 justify-between backdrop-blur-3xl sticky left-0 gap-4">
       
       {/* Logo */}
-      <div className="flex flex-row font-medium items-center hover:text-neutral-300/70 transition justify-center w-full text-neutral-300/55 rounded-lg py-4 bg-neutral-300/10 border border-neutral-300/20">
+      <div className="flex flex-row font-medium items-center hover:text-neutral-300/70 transition justify-center w-full text-neutral-300/55 rounded-lg py-4 bg-neutral-300/5 border border-neutral-300/10">
         <Link href="/">
           <span className={!collapseSidebar ? "block w-full text-center text-2xl bg-transparent" : "hidden"}>
             Solance
@@ -22,7 +22,7 @@ export default function Sidebar({ children }: { children: ReactNode }) {
       </div>
 
       {/* Scrollable content */}
-      <div className="flex-1 flex flex-col overflow-y-auto scrollbar-track-transparent scrollbar-thumb-neutral-800 scrollbar-thin rounded-lg relative px-2 py-6 transition bg-neutral-300/10">
+      <div className="flex-1 flex flex-col overflow-y-auto scrollbar-track-transparent scrollbar-thumb-neutral-800 scrollbar-thin rounded-lg relative px-2 py-6 transition bg-neutral-400/5">
 				<p className="text-neutral-400 text-lg text-center mb-3">Followed coins</p>
         {children}
       </div>

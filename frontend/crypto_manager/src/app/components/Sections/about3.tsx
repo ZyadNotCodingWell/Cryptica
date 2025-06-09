@@ -11,7 +11,7 @@ const About3 = () => {
         <img
           src="/v882-kul-48-a.jpg"
           alt="Crypto Forecast Illustration"
-          className="absolute inset-0 w-full h-full object-cover object-center"
+          className="absolute inset-x-0 bottom-0 w-full h-full object-cover object-center"
         />
         <div className="absolute inset-0 bg-black/60 z-10" />
         <motion.div

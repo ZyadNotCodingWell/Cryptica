@@ -11,7 +11,7 @@ export function CTA(){
 
 export function About(){
 	return(
-		<Link href="about"> 
+		<Link href="#about"> 
 		<Button variant="ghost" className="ml-1 border-2 border-white/65 hover:border-white text-white/55 hover:text-neutral-900/70 px-4 py-1.5 rounded-lg font-semibold transition duration-300">Learn More</Button>
 	</Link>
 	)

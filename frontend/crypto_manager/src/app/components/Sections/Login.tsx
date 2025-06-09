@@ -1,221 +1,218 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import GridBox from "../ui/GridBox";
 import { motion } from "framer-motion";
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
 
 export default function Login() {
-	const router = useRouter();
+  const router = useRouter();
+  const [translateX, setTranslateX] = useState(0);
 
-	const [loginEmail, setLoginEmail] = useState("");
-	const [loginPassword, setLoginPassword] = useState("");
-	const [registerUsername, setRegisterUsername] = useState("");
-	const [registerPassword, setRegisterPassword] = useState("");
-	const [registerVerifyPassword, setRegisterVerifyPassword] = useState("");
-	const [registerEmail, setRegisterEmail] = useState("");
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const [loginSuccess, setLoginSuccess] = useState("");
 
-	const [loginError, setLoginError] = useState("");
-	const [registerError, setRegisterError] = useState("");
-	const [loginSuccess, setLoginSuccess] = useState("");
-	const [registerSuccess, setRegisterSuccess] = useState("");
+  const [registerUsername, setRegisterUsername] = useState("");
+  const [registerEmail, setRegisterEmail] = useState("");
+  const [registerPassword, setRegisterPassword] = useState("");
+  const [registerVerifyPassword, setRegisterVerifyPassword] = useState("");
+  const [registerError, setRegisterError] = useState("");
+  const [registerSuccess, setRegisterSuccess] = useState("");
 
-	const [translateX, setTranslateX] = useState(0);
+  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const loginValid = loginEmail && loginPassword;
+  const registerValid =
+    registerUsername &&
+    registerEmail &&
+    registerPassword &&
+    registerVerifyPassword &&
+    registerPassword === registerVerifyPassword &&
+    isValidEmail(registerEmail);
 
-	const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError("");
+    setLoginSuccess("");
 
-	const login_valid = loginEmail.trim() !== "" && loginPassword.trim() !== "";
-	const register_valid =
-		registerUsername.trim() !== "" &&
-		registerPassword.trim() !== "" &&
-		registerVerifyPassword.trim() !== "" &&
-		registerEmail.trim() !== "" &&
-		registerPassword === registerVerifyPassword &&
-		isValidEmail(registerEmail);
+    try {
+      const res = await fetch("http://localhost:8000/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: loginEmail, password: loginPassword }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setLoginSuccess("Logged in!");
+        localStorage.setItem("access_token", data.access_token);
+        router.push("/dashboard");
+      } else {
+        setLoginError(data.detail || "Login failed");
+      }
+    } catch (err: any) {
+      setLoginError("Login error: " + err.message);
+    }
+  };
 
-	const handleLoginSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setLoginError("");
-		setLoginSuccess("");
-		try {
-			const response = await fetch("http://localhost:8000/auth/login", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ email: loginEmail, password: loginPassword }),
-			});
-			const data = await response.json();
-			if (response.ok) {
-				setLoginSuccess("Login successful!");
-				localStorage.setItem("access_token", data.access_token); // Saving login token
-				router.push("/dashboard");
-			} else {
-				setLoginError(data.detail || "Login failed");
-			}
-		} catch (error: any) {
-			setLoginError("Login failed: " + error.message);
-		}
-	};
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setRegisterError("");
+    setRegisterSuccess("");
 
-	const handleRegisterSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setRegisterError("");
-		setRegisterSuccess("");
-		try {
-			const response = await fetch("http://localhost:8000/auth/register", {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({
-					username: registerUsername,
-					email: registerEmail,
-					password: registerPassword,
-				}),
-			});
-			const data = await response.json();
-			if (response.ok) {
-				setRegisterSuccess("Registration successful!");
-			} else {
-				setRegisterError(data.detail || "Registration failed");
-			}
-		} catch (error: any) {
-			setRegisterError("Registration failed: " + error.message);
-			if(error.message === "Failed to fetch") {
-				setRegisterError("Server is not reachable. Please check your connection.");
-			} else if(error.message === "NetworkError when attempting to fetch resource.") {
-				setRegisterError("Network error. Please check your connection.");
-			} else if(error.message === "EMAIL_ALREADY_REGISTERED."){
-				setRegisterError("Email already registered. Please use a different email.");
-			} else {
-				setRegisterError("Registration failed: " + error.message);
-			}
-		}
-	};
+    try {
+      const res = await fetch("http://localhost:8000/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: registerUsername,
+          email: registerEmail,
+          password: registerPassword,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setRegisterSuccess("Account created!");
+      } else {
+        setRegisterError(data.detail || "Registration failed");
+      }
+    } catch (err: any) {
+      if (err.message.includes("EMAIL_ALREADY_REGISTERED")) {
+        setRegisterError("Email already in use.");
+      } else {
+        setRegisterError("Registration error: " + err.message);
+      }
+    }
+  };
 
-	return (
-	<GridBox rows={8} cols={25} rowColors={['bef2640', '#4d7c0f']} colColors={['bef264', '#4d7c0f']} duration={4} className="flex flex-row w-[200dvw]" >
-		<motion.div className="min-h-screen w-[200dvw] overflow-hidden flex flex-row bg-transparent text-white font-sans items-start pt-24"
-		style = {{ x: `${translateX}%` }} transition={{ type:"tween", ease: "easeInOut", duration: 1.5  }}>
-			{/* Login Side */}
-			<div className="w-1/2 px-6 flex flex-col justify-center items-center bg-transparent border-r border-lime-800/5 shadow-xl">
-				<h1 className="text-3xl text-muted-foreground tracking-tight text-lime-500 drop-shadow-[0_0_14px_#84cc16]">Access your account</h1>
-				<p className="text-lg text-center text-neutral-300/50 mb-6">First time here? Register for free <a className="text-lime-500 hover:underline cursor-pointer" onClick={() => setTranslateX(-50)}>here</a>.</p>
-	
-				<form
-					className="w-full flex flex-col gap-4 max-w-md backdrop-blur-sm bg-neutral-950 border border-lime-400/35 rounded-2xl p-10 shadow-[0_0_20px_#00000066]"
-					onSubmit={handleLoginSubmit}
-				>
-					<h2 className="text-2xl font-semibold text-center mb-8 text-lime-500">User Login</h2>
-	
-					<input
-						type="email"
-						placeholder="Email"
-						className="bg-neutral-900/50 text-neutral-300/30 px-2 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-lime-500 placeholder:text-neutral-300/30"
-						value={loginEmail}
-						onChange={(e) => setLoginEmail(e.target.value)}
-					/>
-					<input
-						type="password"
-						placeholder="Password"
-						className="bg-neutral-900/50 text-neutral-300/30 px-2 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-lime-500 placeholder:text-neutral-300/30"
-						value={loginPassword}
-						onChange={(e) => setLoginPassword(e.target.value)}
-					/>
-	
-					{loginError && <p className="text-red-500 mb-2 text-sm">{loginError}</p>}
-	
-					<button
-						type="submit"
-						disabled={!login_valid}
-						className={`px-2 py-1.5 flex gap-2 items-center justify-center rounded-lg ${login_valid ? 'bg-neutral-900 border border-lime-700 text-lime-500 hover:text-lime-400 hover:border-lime-600 transition' :'bg-neutral-900 border border-neutral-800/50 text-neutral-500/30 cursor-not-allowed'}`}
-					>
-						    <div className="relative flex items-center justify-center size-3">
-                  <div className={`absolute blur-xl size-2 outline outline-2 rounded-full ${login_valid ? 'bg-lime-500 outline-lime-900 ':'bg-red-500 outline-red-900 '}`}></div>
-                  <div className={`absolute size-2 outline outline-3 rounded-full ${login_valid ? 'bg-lime-500 outline-lime-900 ':'bg-red-500 outline-red-900 '}`}></div>
-                </div>
-								<div className=" flex text-center items-center justify-center">Login</div>
-					</button>
-	
-					<div className="flex justify-between items-center mt-6 text-sm text-neutral-300/30">
-						<label className="flex items-center justify-center gap-2">
-							<input type="checkbox" className="accent-lime-500 translate-y-px bg-zinc-300/35 rounded-full" />
-							Remember me
-						</label>
-						<a href="#" className="text-lime-500 hover:underline">
-							Forgot password?
-						</a>
-					</div>
-				</form>
-			</div>
-	
-			{/* Register Side */}
-			<div className="w-1/2 flex flex-col items-center justify-center">
-			<h1 className="text-3xl text-muted-foreground tracking-tight text-lime-500 drop-shadow-[0_0_14px_#84cc16]">Welcome to Cryptica</h1>
-			<p className="text-lg font-light text-center text-neutral-300/30 mb-6">Already registered? Connect to your account <a className="text-lime-500 hover:underline cursor-pointer" onClick={() => setTranslateX(-0)}>here</a>.</p>
-			<form
-					className="w-full max-w-md backdrop-blur-md bg-neutral-950 border border-lime-400/35 rounded-2xl p-10 shadow-[0_0_20px_#00000066] flex flex-col gap-4"
-					onSubmit={handleRegisterSubmit}
-				>
-					<h2 className="text-2xl font-semibold text-center mb-8 text-lime-500">Create an Account</h2>
-	
-					<input
-						type="text"
-						placeholder="Username"
-						className="bg-neutral-900/50 text-neutral-300/30 px-2 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-lime-500 placeholder:text-neutral-300/30"
-						value={registerUsername}
-						onChange={(e) => setRegisterUsername(e.target.value)}
-					/>
-					<input
-						type="password"
-						placeholder="Password"
-						className="bg-neutral-900/50 text-neutral-300/30 px-2 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-lime-500 placeholder:text-neutral-300/30"
-						value={registerPassword}
-						onChange={(e) => setRegisterPassword(e.target.value)}
-					/>
-					<input
-						type="password"
-						placeholder="Verify Password"
-						className="bg-neutral-900/50 text-neutral-300/30 px-2 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-lime-500 placeholder:text-neutral-300/30"
-						value={registerVerifyPassword}
-						onChange={(e) => setRegisterVerifyPassword(e.target.value)}
-					/>
-					<input
-						type="email"
-						placeholder="Email"
-						className={`bg-neutral-900/50 text-neutral-300/30 px-2 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-lime-500 placeholder:text-neutral-300/30 ${
-							registerError === 'Email already registered. Please use a different email.' ? 'ring-2 ring-red-600' : ''
-						}`}
-						value={registerEmail}
-						onChange={(e) => setRegisterEmail(e.target.value)}
-					/>
-	
-					{registerError && <p className="text-red-500 mb-2 text-sm">{registerError}</p>}
-					{registerSuccess && <p className="text-lime-400 mb-2 text-sm">{registerSuccess}</p>}
-	
-					<button
-						type="submit"
-						disabled={!register_valid}
-						className={`px-2 py-1.5 flex gap-2 justify-center items-center rounded-lg mt-4 ${register_valid ? 'bg-neutral-900 border  border-lime-700 text-lime-500 hover:text-lime-400 hover:border-lime-600 transition' : 'bg-neutral-900 border border-neutral-800/50 text-neutral-500/30 cursor-not-allowed'}`}
-					>
-						  <div className="relative flex items-center justify-center size-3 right-0">
-                <div className={`absolute blur-xl size-2 outline outline-2 rounded-full ${register_valid ? 'bg-lime-500 outline-lime-900 ':'bg-red-500 outline-red-900 '}`}></div>
-                <div className={`absolute size-2 outline outline-3 rounded-full ${register_valid ? 'bg-lime-500 outline-lime-900 ':'bg-red-500 outline-red-900 '}`}></div>
+  return (
+    <div className="relative min-h-screen w-full overflow-hidden">
+      {/* Background Image */}
+        <img
+          src="/v882-kul-48-a.jpg"
+          alt="Background"
+          className="object-cover absolute inset-x-0 bottom-0 z-0"
+        />
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+
+      {/* Sliding Panels */}
+      <motion.div
+        className="relative z-10 w-[200dvw] flex min-h-screen"
+        animate={{ x: `${translateX}%` }}
+        transition={{ duration: 0.7, ease: "easeInOut" }}
+      >
+        {/* Login Panel */}
+        <div className="w-[100dvw] flex items-center justify-center px-6 py-16">
+          <div className="max-w-md w-full bg-neutral-900/80 backdrop-blur-md rounded-xl p-8 border border-neutral-700 shadow-2xl">
+            <h1 className="text-3xl font-bold text-lime-400 mb-2">Welcome Back</h1>
+            <p className="text-neutral-300 mb-6">
+              No account?{' '}
+              <button
+                type="button"
+                onClick={() => setTranslateX(-50)}
+                className="text-lime-400 hover:text-lime-300 transition-colors font-medium"
+              >
+                Register here
+              </button>
+            </p>
+
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <Input
+                  type="email"
+                  placeholder="Email"
+                  value={loginEmail}
+                  onChange={(e) => setLoginEmail(e.target.value)}
+                  className="bg-neutral-800 border-neutral-700 text-white"
+                />
               </div>
-							<div className=" flex text-center items-center justify-center">Register</div>
-					</button>
-					<p className="text-sm mt-6 text-neutral-300/30 text-center">
-						By signing up, you agree to our{' '}
-						<a href="#" className="text-lime-500 hover:underline">
-							Terms of Service
-						</a>{' '}
-						and{' '}
-						<a href="#" className="text-lime-500 hover:underline">
-							Privacy Policy
-						</a>
-						.
-					</p>
-				</form>
-				
-			</div>
-		</motion.div>
-	</GridBox>
-	);
-	
+              <div>
+                <Input
+                  type="password"
+                  placeholder="Password"
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  className="bg-neutral-800 border-neutral-700 text-white"
+                />
+              </div>
+              {loginError && <p className="text-red-400 text-sm">{loginError}</p>}
+              {loginSuccess && <p className="text-lime-400 text-sm">{loginSuccess}</p>}
+              <Button
+                type="submit"
+                disabled={!loginValid}
+                className="w-full bg-lime-600 hover:bg-lime-500 text-white font-medium py-2 px-4 rounded transition-colors"
+              >
+                Login
+              </Button>
+            </form>
+          </div>
+        </div>
+
+        {/* Register Panel */}
+        <div className="w-[100dvw] flex items-center justify-center px-6 py-16">
+          <div className="max-w-md w-full bg-neutral-900/80 backdrop-blur-md rounded-xl p-8 border border-neutral-700 shadow-2xl">
+            <h1 className="text-3xl font-bold text-lime-400 mb-2">Create Account</h1>
+            <p className="text-neutral-300 mb-6">
+              Already have an account?{' '}
+              <button
+                type="button"
+                onClick={() => setTranslateX(0)}
+                className="text-lime-400 hover:text-lime-300 transition-colors font-medium"
+              >
+                Login here
+              </button>
+            </p>
+
+            <form onSubmit={handleRegister} className="space-y-4">
+              <div>
+                <Input
+                  type="text"
+                  placeholder="Username"
+                  value={registerUsername}
+                  onChange={(e) => setRegisterUsername(e.target.value)}
+                  className="bg-neutral-800 border-neutral-700 text-white"
+                />
+              </div>
+              <div>
+                <Input
+                  type="email"
+                  placeholder="Email"
+                  value={registerEmail}
+                  onChange={(e) => setRegisterEmail(e.target.value)}
+                  className="bg-neutral-800 border-neutral-700 text-white"
+                />
+              </div>
+              <div>
+                <Input
+                  type="password"
+                  placeholder="Password"
+                  value={registerPassword}
+                  onChange={(e) => setRegisterPassword(e.target.value)}
+                  className="bg-neutral-800 border-neutral-700 text-white"
+                />
+              </div>
+              <div>
+                <Input
+                  type="password"
+                  placeholder="Confirm Password"
+                  value={registerVerifyPassword}
+                  onChange={(e) => setRegisterVerifyPassword(e.target.value)}
+                  className="bg-neutral-800 border-neutral-700 text-white"
+                />
+              </div>
+              {registerError && <p className="text-red-400 text-sm">{registerError}</p>}
+              {registerSuccess && <p className="text-lime-400 text-sm">{registerSuccess}</p>}
+              <Button
+                type="submit"
+                disabled={!registerValid}
+                className="w-full bg-lime-600 hover:bg-lime-500 text-white font-medium py-2 px-4 rounded transition-colors"
+              >
+                Register
+              </Button>
+            </form>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
 }

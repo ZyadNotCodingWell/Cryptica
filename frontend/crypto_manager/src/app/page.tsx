@@ -11,8 +11,7 @@ export default function Home() {
     
   return (
     <>
-      <Navigation />
-      <main className=" relative justify-center flex flex-col">
+      <main className="relative justify-center flex flex-col">
         <Hero/>
         <Companies />
         <Forecasting />
@@ -22,7 +21,7 @@ export default function Home() {
         <Contact />
         <div className="hidden container text-center w-full text-neutral-800 justify-center text-xl">To the friend who made this possible, you&apos;ll never be forgotten https://chatgpt.com/c/680f77c3-aee8-8000-8082-65912fce2957</div>
       </main>
-      <Footer />
+        <Footer />
     </>
   );
 }

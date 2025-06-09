@@ -1,108 +1,66 @@
 "use client";
-import { useState } from "react";
-import React from "react";
-import { Plus, Trash, ChartAreaIcon } from "lucide-react";
+import { Plus, Trash, ChartArea } from "lucide-react";
 
 type FollowedCoinProps = {
   name: string;
-  apiReference: string;
+  apiReference: string; // ticker
   selected: boolean;
   onRemove: () => void;
   onSelect: () => void;
 };
 
-const FollowedCoin = ({ name, apiReference, onRemove, onSelect, selected }: FollowedCoinProps) => {
-  const [hoveringDelete, setHoveringDelete] = useState(false);
-  const [hoveringSelect, setHoveringSelect] = useState(false);
-
+const FollowedCoin = ({
+  name,
+  apiReference,
+  onRemove,
+  onSelect,
+  selected,
+}: FollowedCoinProps) => {
   return (
     <div
-      className={`flex items-center justify-between w-full px-3 py-2 my-2 gap-2 rounded-xl
-        border shadow-md backdrop-blur-md
-        transition-all duration-200 ease-in-out transform hover:scale-[102%]
-        ${
-          selected
-            ? hoveringDelete
-              ? "border-red-500"
-              : "border-lime-400/90 bg-lime-400/5"
-            : hoveringDelete
-            ? "border-red-500"
-            : hoveringSelect
-            ? "border-lime-500/30 bg-lime-500/5"
-            : "border-neutral-300/10 hover:border-neutral-300/20 bg-neutral-900/30"
-        }
-      `}
+      className={`flex items-center w-full p-3 rounded-lg transition-all duration-200
+        ${selected ? "bg-lime-500/10 border-lime-500/30" : "bg-white/5 hover:bg-white/10"}
+        border ${selected ? "border-lime-500/30" : "border-transparent hover:border-white/10"}
+        shadow-sm hover:shadow-md`}
+        onClick={onSelect}
     >
-      {/* Left Indicator */}
-      <div className="relative flex items-center h-2 px-1">
-        {hoveringDelete ? (
-          <>
-            <div className="absolute size-2 bg-red-500 rounded-full blur-sm opacity-50" />
-            <div className="absolute size-2 bg-red-500 rounded-full opacity-80" />
-          </>
-        ) : hoveringSelect ? (
-          <>
-            <div className="absolute size-2 bg-lime-500 rounded-full blur-lg opacity-90" />
-            <div className="absolute size-2 bg-lime-500 outline outline-lime-800 rounded-full opacity-80" />
-          </>
-        ) : (
-          <>
-            <div
-              className={`absolute size-2 rounded-full blur-sm opacity-50 ${
-                selected ? "bg-lime-400" : "bg-neutral-300/50"
-              }`}
-            />
-            <div
-              className={`absolute size-2 rounded-full opacity-80 outline ${
-                selected
-                  ? "bg-lime-500 outline-lime-800"
-                  : "bg-neutral-300/30 outline-neutral-800"
-              }`}
-            />
-          </>
-        )}
+      {/* Coin Indicator */}
+      <div className="flex items-center mr-3">
+        <div className={`w-2 h-2 rounded-full ${selected ? "bg-lime-500" : "bg-white/30"}`} />
       </div>
 
-      {/* Name and Reference */}
-      <div className="flex flex-col flex-grow gap-0 px-2 overflow-hidden items-center w-full">
-        <h2
-          className={`truncate text-sm font-semibold ${
-            hoveringDelete
-              ? "text-red-500"
-              : selected
-              ? "text-lime-500"
-              : "text-neutral-300/70"
+      {/* Coin Info */}
+      <div className="flex-grow min-w-0">
+        <h3
+          className={`truncate font-semibold ${
+            selected ? "text-lime-400 text-base" : "text-white text-base"
           }`}
+          title={name}
         >
           {name}
-        </h2>
-        <p className="text-xs text-neutral-300/20 truncate">{apiReference}</p>
+        </h3>
+        <p className="text-xs text-white/50 truncate" title={apiReference}>
+          {apiReference}
+        </p>
       </div>
 
       {/* Action Buttons */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 ml-2">
         <button
-          className={`transition duration-200 ${
-            hoveringDelete
-              ? "text-red-500"
-              : selected
-              ? "text-lime-400"
-              : "text-neutral-300/40 hover:text-lime-400"
-          }`}
           onClick={onSelect}
-          onMouseEnter={() => setHoveringSelect(true)}
-          onMouseLeave={() => setHoveringSelect(false)}
+          className={`p-1 rounded-md transition-colors
+            ${selected ? "text-lime-400" : "text-white/40 hover:text-lime-400"}
+            hover:bg-white/5`}
+          aria-label="Select coin"
         >
-          <ChartAreaIcon className="w-4 h-4" />
+          <ChartArea className="w-5 h-5" />
         </button>
         <button
           onClick={onRemove}
-          onMouseEnter={() => setHoveringDelete(true)}
-          onMouseLeave={() => setHoveringDelete(false)}
-          className="transition duration-200 text-neutral-300/40 hover:text-red-500"
+          className="p-1 rounded-md text-white/40 hover:text-red-400 hover:bg-white/5 transition-colors"
           aria-label="Remove coin"
         >
-          <Trash className="w-4 h-4" />
+          <Trash className="w-5 h-5" />
         </button>
       </div>
     </div>
@@ -124,8 +82,6 @@ export function SearchedCoin({
   clearSearch,
   token,
 }: SearchedCoinProps) {
-  const [hovering, setHovering] = useState(false);
-
   const handleFollow = async () => {
     try {
       await fetch(`http://localhost:8000/coins/follow/${apiReference}`, {
@@ -141,52 +97,31 @@ export function SearchedCoin({
   };
 
   return (
-    <div
-      className={`flex items-center justify-between w-full px-3 py-2 my-2 rounded-xl
-        border backdrop-blur-md transition-all duration-200 shadow-md
-        ${
-          hovering
-            ? "border-lime-500 bg-lime-500/5"
-            : "border-neutral-300/10 hover:border-neutral-300/20 bg-neutral-900/30"
-        }
-      `}
-    >
-      {/* Left Indicator */}
-      <div className="relative flex items-center h-2 px-1">
-        {hovering ? (
-          <>
-            <div className="absolute size-2 bg-lime-500 rounded-full blur-lg opacity-90" />
-            <div className="absolute size-2 bg-lime-500 outline outline-lime-800 rounded-full opacity-80" />
-          </>
-        ) : (
-          <div className="absolute size-2 bg-neutral-300/50 outline outline-neutral-300/30 rounded-full opacity-80" />
-        )}
+    <div className="flex items-center w-full p-3 rounded-lg bg-white/5 hover:bg-white/10 border border-transparent hover:border-white/10 transition-all duration-200">
+      {/* Coin Indicator */}
+      <div className="flex items-center mr-3">
+        <div className="w-2 h-2 rounded-full bg-white/30" />
       </div>
 
-      {/* Info */}
-      <div className="flex flex-col flex-grow gap-0 px-2 overflow-hidden items-center w-full">
-        <h2
-          className={`truncate text-sm font-semibold ${
-            hovering ? "text-lime-500" : "text-neutral-500"
-          }`}
-        >
+      {/* Coin Info */}
+      <div className="flex-grow min-w-0">
+        <h3 className="text-base font-semibold text-white truncate" title={name}>
           {name}
-        </h2>
-        <p className="text-xs text-neutral-300/20 truncate">{apiReference}</p>
+        </h3>
+        <p className="text-xs text-white/50 truncate" title={apiReference}>
+          {apiReference}
+        </p>
       </div>
 
       {/* Add Button */}
       <button
         onClick={() => {
-          console.log("Button Clicked");
           handleFollow();
           clearSearch();
           setShowResults(false);
           window.location.reload();
         }}
-        onMouseEnter={() => setHovering(true)}
-        onMouseLeave={() => setHovering(false)}
-        className="transition duration-200 text-neutral-300/40 hover:text-lime-500"
+        className="p-1 rounded-md text-white/40 hover:text-lime-400 hover:bg-white/5 transition-colors"
         aria-label="Add coin to followed list"
       >
         <Plus className="w-5 h-5" />

@@ -1,65 +1,112 @@
-"use client"
+"use client";
 
-import { CTA, About } from "./Buttons";
-import { motion } from "framer-motion";
-
-
+import { Signal, Orbit } from "lucide-react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { About, CTA } from "./Buttons";
+import { useRef } from "react";
+import starsBg from "./../../../../public/stars.png"; // reuse this for bg parallax
 
 export default function Hero() {
-	const getRandomValue = () => Math.floor(Math.random() * 20) + 1;
-	const candlebars = Array.from({ length: 40 }, (_, index) => ({ id: index, value: getRandomValue() }));
-	return(
-		<section id="hero" className="max-w-[100vw] py-16 px-24">
-			<div className="translate-y-12 flex flex-col w-full items-center justify-center relative container mx-auto max-w-screen-xl">
-				<div className="-translate-x-40 translate-y-40 -z-10 absolute inset-0 -top-96 flex flex-row h-[80svh] justify-start gap-8 overflow-hidden w-full items-end [mask-image:linear-gradient(to_right,transparent_30%,black_45%,black_55%,transparent_98%)] blur-[1px] ">
-					{candlebars.map(item => (
-            <div key={item.id} className={(item.id === 0 || (item.value >= candlebars[item.id - 1].value))? "bg-lime-600 w-5 rounded-full [mask-image:linear-gradient(to_top,transparent_15%,black_35%,black_65%,transparent_85%)]":"bg-red-500 w-2 rounded-full [mask-image:linear-gradient(to_top,transparent_15%,black_35%,black_65%,transparent_85%)]"} style={{ height: `${item.value * 5}%`}}></div>
-          ))}
-				</div>
-				<div className="-translate-x-[162px] translate-y-40 -z-10 absolute inset-0 -top-96 flex flex-row h-[80svh] justify-start gap-8 overflow-hidden w-full items-end [mask-image:linear-gradient(to_right,transparent_30%,black_45%,black_55%,transparent_98%)] blur-[1px] ">
-					{candlebars.map(item => (
-            <div key={item.id} className={(item.id === 0 || (item.value >= candlebars[item.id - 1].value))? "bg-lime-600 w-5 rounded-full [mask-image:linear-gradient(to_top,transparent_15%,black_25%,black_75%,transparent_85%)]":"bg-red-500 w-2 rounded-full [mask-image:linear-gradient(to_top,transparent_25%,black_35%,black_75%,transparent_85%)]"} style={{ height: `${item.value * 5}%`}}></div>
-          ))}
-				</div>
-				<motion.div
-				  initial={{ opacity: 0, y: 20 }}
-				  animate={{ opacity: 1, y: 0 }}
-				  transition={{ duration: 0.8, ease: "easeOut" }}
-				  className="w-full flex flex-col items-center justify-center py-4"
-				>
-				  <motion.h1
-				    initial={{ opacity: 0, scale: 0.95 }}
-				    animate={{ opacity: 1, scale: 1 }}
-				    transition={{ duration: 0.9, delay: 0.2, ease: "easeOut" }}
-				    className="text-center text-transparent bg-gradient-to-t pb-2 from-neutral-200/80 to-neutral-200/95 bg-clip-text text-7xl text-balance font-medium tracking-tight cursor-default max-w-3xl"
-				  >
-				    Crypto forecasting and tracking
-				  </motion.h1>
+  const sectionRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'end start'],
+  });
 
-				  <motion.p
-				    initial={{ opacity: 0, y: 10 }}
-				    animate={{ opacity: 1, y: 0 }}
-				    transition={{ duration: 0.6, delay: 0.5 }}
-				    className="text-center text-xl text-neutral-50/50 max-w-3xl text-balance mt-1 font-light cursor-default"
-				  >
-				    We developed an app to visualize the crypto market while being able to make forecasts and predictions.
-				  </motion.p>
+  const bgY = useTransform(scrollYProgress, [0, 1], [-150, 200]);
 
-				  <motion.div
-				    initial={{ opacity: 0, y: 10 }}
-				    animate={{ opacity: 1, y: 0 }}
-				    transition={{ duration: 0.6, delay: 0.8 }}
-				    className="flex mt-8 py-4 gap-4"
-				  >
-				    <CTA />
-				    <About />
-				  </motion.div>
-				</motion.div>
-
-
+  return (
+    <motion.section
+      id="hero"
+      ref={sectionRef}
+      className="relative py-24 md:py-32 overflow-hidden w-full"
+      style={{
+        backgroundImage: `url(${starsBg.src})`,
+        backgroundPosition: `center`,
+        backgroundRepeat: "repeat",
+        backgroundSize: "cover",
+        backgroundPositionY: bgY,
+      }}
+    >
+      {/* Gradient Glow Rings */}
+			<div
+			  className="absolute left-1/2 top-[60%] -translate-x-1/2 -translate-y-1/2 -z-10 w-[min(90vw,900px)] aspect-square rounded-full border border-neutral-300/80"
+			  style={{
+			    maskImage: "linear-gradient(to top, transparent, transparent, white, white, white, transparent, transparent)",
+			    WebkitMaskImage: "linear-gradient(to top, transparent, transparent, white, white, white, transparent, transparent)",
+			    padding: "clamp(2rem, 10vw, 5rem)" // Responsive padding
+			  }}
+			>
+			  <div 
+			    className="w-full h-full border border-neutral-300/50 rounded-full animate-[spin_32s_linear_infinite] flex items-center justify-center"
+			    style={{
+			      padding: "clamp(2rem, 10vw, 5rem)" // Same responsive padding
+			    }}
+			  >
+			    <div 
+			      className="w-full h-full border border-neutral-300/50 rounded-full animate-[spin_32s_linear_infinite_reverse] flex items-center justify-center"
+			      style={{
+			        padding: "clamp(2rem, 10vw, 5rem)" // Same responsive padding
+			      }}
+			    >
+			      <div className="text-transparent pointer-events-none cursor-default">a</div>
+			    </div>
+			  </div>
 			</div>
-				
-			
-		</section>
-	)
+
+      {/* Blurred Radial Overlay */}
+		<div className="absolute inset-0 bg-[radial-gradient(55%_55%_at_center_center,rgba(73,125,0,0.75)_5%,rgba(73,125,0,0.15)_70%,transparent)] -z-10" />
+
+      <div className="container mx-auto relative z-10">
+        <div className="flex flex-col gap-5 items-center text-center">
+
+          {/* Icon */}
+          <motion.span
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="flex size-20 md:size-24 items-center justify-center rounded-full border border-neutral-300/10 bg-neutral-900/15 backdrop-blur-sm"
+          >
+            <Orbit className="size-8 text-neutral-300/80" />
+          </motion.span>
+
+          {/* Heading */}
+          <motion.h1
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+            className="text-4xl md:text-6xl font-semibold text-transparent bg-clip-text text-balance bg-gradient-to-b from-neutral-300 via-neutral-300 to-lime-200 max-w-5xl"
+          >
+            Forecast crypto markets visually and intuitively.
+          </motion.h1>
+
+          {/* Description */}
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.4 }}
+            className="text-neutral-400 max-w-3xl mx-auto md:text-xl text-balance"
+          >
+            Real-time data. Clean visualizations. AI-powered predictions. Track and anticipate market moves with confidence.
+          </motion.p>
+
+          {/* CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.4 }}
+            className="flex flex-col items-center justify-center gap-3 pt-6 pb-10"
+          >
+            <div className="flex gap-2">
+              <CTA />
+              <About />
+            </div>
+            <div className="text-sm	 text-muted-foreground">
+              No credit card required. 100% free while in beta.
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </motion.section>
+  );
 }

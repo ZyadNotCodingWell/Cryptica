@@ -1,107 +1,191 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-import dynamic from "next/dynamic";
-import { useMemo, useRef, useState } from "react";
-import { ApexOptions } from "apexcharts";
-
-const ApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
+import Plot from 'react-plotly.js';
+import { useMemo, useEffect, useState } from 'react';
 
 interface CandlestickChartProps {
-  candles: any[];
+  candles: [number, number, number, number, number][]; // [timestamp, o, h, l, c]
 }
 
 export const CandlestickChart = ({ candles }: CandlestickChartProps) => {
-  const chartRef = useRef<HTMLDivElement>(null);
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  // State for active candle data
+  const [activeCandle, setActiveCandle] = useState<{
+    open: number;
+    high: number;
+    low: number;
+    close: number;
+    change: string;
+    isUp: boolean;
+  } | null>(null);
 
-  const seriesData = useMemo(
-    () => candles.map(c => ({ x: c[0], y: [+c[1], +c[2], +c[3], +c[4]] })),
-    [candles]
-  );
-
-  const hoveredOHLC = useMemo(() => {
-    if (hoveredIndex !== null && candles[hoveredIndex]) {
-      const [_, o, h, l, c] = candles[hoveredIndex];
-      return { o, h, l, c };
-    }
-    return null;
-  }, [hoveredIndex, candles]);
-
-  const chartOptions: ApexOptions = useMemo(() => ({
-    chart: {
-      type: "candlestick",
-      background: "#0a0a0a00",
-      toolbar: { show: false },
-      animations: { enabled: false },
-      events: {
-        mouseMove: (e, _ctx, config) => {
-          const idx = config.dataPointIndex;
-          setHoveredIndex(idx >= 0 ? idx : null);
-        },
-        mouseLeave: () => {
-          setHoveredIndex(null);
-        }
-      }
-    },
-    tooltip: { enabled: false },
-    grid: { borderColor: "#171717", strokeDashArray: 4 },
-    xaxis: {
-      type: "datetime",
-      labels: {
-        style: { colors: "#afafafaf" },
-        datetimeFormatter: {
-          hour: "HH:mm",
-          day: "dd MMM",
-          month: "MMM yyyy"
-        }
-      },
-      tickAmount: 8
-    },
-    yaxis: {
-      labels: { style: { colors: "#afafafaf" } }
-    },
-    plotOptions: {
-      candlestick: {
-        colors: {
-          upward: "#84cc16",
-          downward: "#dc2626"
-        },
-        borderRadius: 5,
-        wick: { useFillColor: true },
-        stroke: { width: 1, colors: ["#a7a7a760"] }
-      }
-    },
-    theme: { mode: "dark" }
+  // Process candle data
+  const { dates, opens, highs, lows, closes } = useMemo(() => ({
+    dates: candles.map(c => new Date(c[0])),
+    opens: candles.map(c => c[1]),
+    highs: candles.map(c => c[2]),
+    lows: candles.map(c => c[3]),
+    closes: candles.map(c => c[4])
   }), [candles]);
 
+  // Initialize with last candle
+  useEffect(() => {
+    if (candles.length > 0) {
+      const lastCandle = candles[candles.length - 1];
+      const change = ((lastCandle[4] - lastCandle[1]) / lastCandle[1]) * 100;
+      setActiveCandle({
+        open: lastCandle[1],
+        high: lastCandle[2],
+        low: lastCandle[3],
+        close: lastCandle[4],
+        change: `${change.toFixed(2)}%`,
+        isUp: change >= 0
+      });
+    }
+  }, [candles]);
+
+  // Update on hover
+	const handleHover = (event: any) => {
+	  if (event?.points?.[0]) {
+	    const i = event.points[0].pointIndex;
+	    const change = ((closes[i] - opens[i]) / opens[i]) * 100;
+	    setActiveCandle({
+	      open: opens[i],
+	      high: highs[i],
+	      low: lows[i],
+	      close: closes[i],
+	      change: `${change.toFixed(2)}%`,
+	      isUp: change >= 0
+	    });
+	  }
+	};
+
+
+  // Format price with proper decimals
+  const formatPrice = (price: number) => {
+		console.log("formatPrice called with:", price, typeof price);
+
+  	if (price === undefined || isNaN(price)) return '-';
+    // For BTC: 2 decimals, for altcoins: 4-6 decimals
+    const decimals = price > 100 ? 2 : 6;
+    return price.toFixed(decimals);
+  };
+
+  const chartData = useMemo(() => [{
+    type: 'candlestick',
+    x: dates,
+    open: opens,
+    high: highs,
+    low: lows,	
+    close: closes,
+    increasing: { line: { color: '#88cc14' }, fillcolor: '#88cc14' },
+    decreasing: { line: { color: '#dc2626' }, fillcolor: '#dc2626' },
+    hoverinfo: 'x+y',
+    name: 'Price'
+  }], [dates, opens, highs, lows, closes]);
+
+const layout = useMemo(() => ({
+  autosize: true,
+  paper_bgcolor: 'rgba(0,0,0,0)',
+  plot_bgcolor: 'rgba(0,0,0,0)',
+  margin: { t: 0, b: 30, l: 50, r: 30 },
+  xaxis: {
+    type: 'date',
+    gridcolor: 'rgba(255,255,255,0.05)',
+    tickfont: { color: 'rgba(175,175,175,0.7)' },
+    rangeslider: { visible: false },
+    fixedrange: false,
+    showspikes: true,
+    spikemode: 'across',
+    spikesnap: 'cursor',
+    spikedash: 'solid',
+    spikecolor: 'rgba(255,255,255,0.3)',
+    spikethickness: 0.5
+  },
+  yaxis: {
+    gridcolor: 'rgba(255,255,255,0.05)',
+    tickfont: { color: 'rgba(175,175,175,0.7)' },
+    fixedrange: false,
+    showspikes: true,
+    spikemode: 'across',
+    spikesnap: 'cursor',
+    spikedash: 'solid',
+    spikecolor: 'rgba(255,255,255,0.3)',
+    spikethickness: 0.5
+  },
+  hovermode: 'x', // 👈 shows vertical line + x timestamp
+  showlegend: false,
+  dragmode: 'pan',
+  modeBarButtonsToRemove: ['autoScale2d', 'lasso2d', 'select2d']
+}), []);
+
+
   return (
-    <div ref={chartRef} className="w-full h-full">
-      <div className=" w-full flex justify-center pointer-events-none">
-  			<div className="px-3 py-1 rounded lg:text-xl md:text-base text-xs w-full font-semibold">
-  			  {hoveredOHLC ? 
-  			    <div className="grid md:grid-cols-4 grid-rows-4 gap-2 w-full">
-  			      <div className="md:col-span-1 md:row-span-4 col-span-4 row-span-1 bg-neutral-300/10 py-0.5 rounded-md text-center text-neutral-300/60">O: {hoveredOHLC.o}</div>
-  			      <div className="md:col-span-1 md:row-span-4 col-span-4 row-span-1 bg-neutral-300/10 py-0.5 rounded-md text-center text-lime-500">			H: {hoveredOHLC.h}</div>
-  			      <div className="md:col-span-1 md:row-span-4 col-span-4 row-span-1 bg-neutral-300/10 py-0.5 rounded-md text-center text-red-600">				L: {hoveredOHLC.l}</div>
-  			      <div className="md:col-span-1 md:row-span-4 col-span-4 row-span-1 bg-neutral-300/10 py-0.5 rounded-md text-center text-neutral-300/60">C: {hoveredOHLC.c}</div>
-  			    </div>
-  			   : (
-  			    <div className="grid grid-cols-4 gap-2 w-full">
-  			      <div className="md:col-span-1 md:row-span-4 col-span-4 row-span-1 bg-neutral-300/10 py-0.5 rounded-md text-center text-neutral-300/60">O:</div>
-  			      <div className="md:col-span-1 md:row-span-4 col-span-4 row-span-1 bg-neutral-300/10 py-0.5 rounded-md text-center text-lime-500">			H:</div>
-  			      <div className="md:col-span-1 md:row-span-4 col-span-4 row-span-1 bg-neutral-300/10 py-0.5 rounded-md text-center text-red-600">				L:</div>
-  			      <div className="md:col-span-1 md:row-span-4 col-span-4 row-span-1 bg-neutral-300/10 py-0.5 rounded-md text-center text-neutral-300/60">C:</div>
-  			    </div>
-  			  )}
-  			</div>
+    <div className="w-full h-full flex flex-col" style={{ minHeight: '500px' }}>
+      {/* OHLC Display */}
+      <div className="bg-neutral-800/50 p-3 rounded-t-lg border-b border-neutral-700">
+        <div className="grid grid-cols-5 gap-2 text-center">
+          <div>
+            <p className="text-xs text-neutral-400">Open</p>
+            <p className="font-mono text-sm">
+              {activeCandle ? formatPrice(activeCandle.open) : '-'}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-neutral-400">High</p>
+            <p className="font-mono text-sm text-lime-500">
+              {activeCandle ? formatPrice(activeCandle.high) : '-'}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-neutral-400">Low</p>
+            <p className="font-mono text-sm text-red-500">
+              {activeCandle ? formatPrice(activeCandle.low) : '-'}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-neutral-400">Close</p>
+            <p className={`font-mono text-sm ${
+              activeCandle?.isUp ? 'text-lime-500' : 'text-red-500'
+            }`}>
+              {activeCandle ? formatPrice(activeCandle.close) : '-'}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs text-neutral-400">Change</p>
+            <p className={`font-mono text-sm ${
+              activeCandle?.isUp ? 'text-lime-500' : 'text-red-500'
+            }`}>
+              {activeCandle?.change || '-'}
+            </p>
+          </div>
+        </div>
       </div>
-      <ApexChart
-        options={chartOptions}
-        series={[{ data: seriesData }]}
-        type="candlestick"
-        height="120%"
-        width="100%"
-      />
+
+      {/* Chart Area */}
+      <div className="flex-1 mt-12">
+        <Plot
+          data={chartData}
+          layout={layout}
+					onHover={handleHover}
+          config={{
+            displayModeBar: true,
+            scrollZoom: true,
+            displaylogo: false
+          }}
+          style={{ width: '100%', height: '100%' }}
+          useResizeHandler
+        />
+				<style>
+				  {`
+				    .js-plotly-plot .hoverlayer .hovertext {
+				      opacity: 0 !important;
+				      pointer-events: none;
+				    }
+				  `}
+				</style>
+
+      </div>
     </div>
+		
   );
 };
+

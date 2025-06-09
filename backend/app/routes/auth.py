@@ -3,7 +3,7 @@ from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 from passlib.context import CryptContext
 from app.db.session import get_db
-from app.db.create_tables import User
+from app.db.models.schema import User
 from .auth_utils import create_access_token  # import the token creator
 
 

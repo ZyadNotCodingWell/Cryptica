@@ -1,18 +1,18 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import Sidebar from "../LayoutElements/Sidebar";
-import DashHeader from '../LayoutElements/DashHeader';
-import FollowedCoin from './FollowedCrypto';
+import Sidebar from "../components/LayoutElements/Sidebar";
+import DashHeader from '../components/LayoutElements/DashHeader';
+import FollowedCoin from '../components/Sections/FollowedCrypto';
 import { useRouter } from "next/navigation";
 import React from 'react';
-import {TradeScreen} from '../LayoutElements/TradeScreen';
-import { Skeleton } from '../ui/skeleton';
+import {TradeScreen} from '../components/LayoutElements/TradeScreen';
+import GridBox from '../components/ui/GridBox';
 
-import { motion } from 'framer-motion';
 interface Coin {
   name: string;
-  ticker: string;
+  api_reference: string;
+  icon_link?: string;
 }
 
 export default function ClientDashboard() {
@@ -53,7 +53,6 @@ export default function ClientDashboard() {
 				
 				setDashboardData(dashboardData);
         setCoins(coinsData);
-				console.log(dashboardData)
       } catch (error) {
         console.error("Failed to fetch dashboard data:", error);
       } finally {
@@ -81,7 +80,7 @@ export default function ClientDashboard() {
 	  if (res.ok) {
 	    // remove it from your local state
 	    setCoins((prev) =>
-	      prev.filter((c) => c.ticker !== apiReference)
+	      prev.filter((c) => c.api_reference !== apiReference)
 	    );
 	  } else {
 	    console.error("Unfollow failed", await res.json());
@@ -90,37 +89,40 @@ export default function ClientDashboard() {
 
 
 	return (
-		<div className={`antialiased py-2 gap-2 w-full bg-black grid grid-cols-12 grid-rows-1 h-full z-[99]`}>
+		<div className={`antialiased px-1 py-2 gap-4 w-full bg-black flex flex-row h-full overflow-hidden`}>
 			<Sidebar>
-				{coins.map((coin, index) => (
-					<motion.div
-						key={coin.ticker}
-						initial={{ opacity: 0, y: 20 }}
-    				  animate={{ opacity: 1, y: 0 }}
-    				  transition={{
-								delay: index * 0.05,
-    				    duration: 0.4,
-    				  	ease: [0.25, 0.1, 0.25, 1],
-    				  }}
-    				  whileHover={{
-    				    scale: 1.0,
-    				    boxShadow: "0px 0px 12px rgba(255, 255, 255, 0.01)",
-    				  }}
-							className='w-full flex px-0 py-0.5'>
-						<FollowedCoin
-							name={coin.name}
-							apiReference={coin.ticker}
-							onRemove={() => handleUnfollow(coin.ticker)}
-							onSelect={() => {setSelectedApiRef(coin.ticker); }}
-							selected={coin.ticker === selectedApiRef}
-						/>
-					</motion.div>
+				{coins.map((coin) => (
+					<FollowedCoin
+					key={coin.api_reference}
+					name={coin.name}
+					apiReference={coin.api_reference}
+					onRemove={() => handleUnfollow(coin.api_reference)}
+					onSelect={() => {setSelectedApiRef(coin.api_reference); }}
+					selected={coin.api_reference === selectedApiRef}
+					/>
 				))}
 			</Sidebar>
-			<main className="justify-start col-span-10 flex flex-col w-full h-full bg-neutral-950 rounded-2xl">
-				<DashHeader setSearchResults={setSearchResults} searchResults={searchResults} username={dashboardData? dashboardData.username : <Skeleton className='h-6 w-16' />  } token={token!} />
-				<div className='flex flex-1 relative'>
-					<TradeScreen apiReference={selectedApiRef} tier={dashboardData? dashboardData.tier : "free"} />
+			<main className="relative justify-start gap-4 flex flex-col w-full h-full bg-transparent overflow-auto">
+				{dashboardData?.username ? (
+					<DashHeader setSearchResults={setSearchResults} searchResults={searchResults} username={dashboardData?.username} token={token!} />
+				) : (
+					<div className='flex flex-row w-full py-3 text-5xl bg-neutral-950 border border-neutral-300/5 rounded-2xl text-center items-center text-transparent'>Loading</div>
+				)}
+				<div className="flex flex-row h-full justify-between gap-8 overflow-auto">
+					<GridBox  rows={7} cols={5} rowColors={['#84cc1600', '#84cc16']} colColors={['#84cc16', '#84cc1600']} duration={5} className="flex w-full h-full rounded-3xl overflow-clip">
+						<section className="w-full h-full flex flex-col rounded-xl items-center border border-lime-500/0 overflow-auto"> 
+							{loading ? (
+								<div className="text-transparent flex w-full h-full border border-neutral-300/5 bg-neutral-950 rounded-2xl items-center justify-center text-5xl">Loading...</div>
+							) : (
+								<div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+									{/* Add something here later */} 
+								</div>
+							)}
+							<div className="flex-1 w-full overflow-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-lime-500">
+								<TradeScreen apiReference={selectedApiRef} tier={dashboardData.tier} />
+							</div>
+						</section>
+					</GridBox>
 				</div>
 			</main>
 		</div>
